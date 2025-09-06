@@ -1,0 +1,262 @@
+Jeb Ory | 01:01
+Mike.
+Mike Rose | 01:03
+Hey, how are you? Sorry, a couple of minutes late.
+Jeb Ory | 01:05
+No, not at all. How are you doing?
+Mike Rose | 01:07
+I'm doing well. Good to finally connect.
+Jeb Ory | 01:10
+I really appreciate you making the time and working with my schedule, which has been a little bit nutty.
+Mike Rose | 01:15
+No problem.
+Jeb Ory | 01:18
+So where are you calling from right now?
+Mike Rose | 01:21
+DC how about you?
+Jeb Ory | 01:22
+Okay, do you live in the district or are you?
+Mike Rose | 01:26
+Yeah, I do. I live up on Capitol Hill, we're on New Jersey Avenue Northwest, right next to the Capitol building or near the Capitol building here.
+Jeb Ory | 01:36
+Okay, I'm pretty close. I live at 4th and E Street Capitol. Yeah, 1344th Street northeast.
+Mike Rose | 01:41
+For really?
+Jeb Ory | 01:44
+Yeah, [Laughter] 19.
+Mike Rose | 01:46
+You and I are neighbors. I live at 19 Fourth Street Southeast. I bet fourth and a southeast.
+Jeb Ory | 01:55
+Okay, yeah, we get a lot of mail for 134th Street Southeast, [Laughter] so, yeah, likewise.
+Mike Rose | 01:59
+[Laughter] That's hilarious.
+Well, good, Jeff. Well, good to meet a neighbor.
+Jeb Ory | 02:09
+And appreciate, as Scott had mentioned, I should connect with you. So I'll give you a little bit of background on myself, on what I'm doing, and then I would love to hear a little color in your background and to get your feedback on what I'm looking into.
+Mike Rose | 02:19
+Two?
+Jeb Ory | 02:21
+So I had previously built and then sold a company called Phone to Action. I don't know if you ever ran into that. We made grassroots advocacy tools and we merged with Quorum in 22.
+Mike Rose | 02:29
+Yeah.
+Jeb Ory | 02:33
+I was the founding CEO and CEO up until the last year. We had previously gone through a private equity round in 2019 and then ultimately transacted with Quorum in 2022.
+For the last couple of years, I've been working with different early-stage companies, but I've always missed the game and have been looking at different ideas. I was actually reading... I don't know if you've read "The Wolves of K Street" yet.
+Mike Rose | 03:00
+No. I have not seen it. I've seen it, but I have not read it.
+Jeb Ory | 03:04
+So, a good book, but I read it and there was a section about the outside game. It's talking about Google's work on net neutrality and stuff. We were ground zero and not ground zero.
+I was involved in a lot of those different things. I remember a conversation I had with my client at Google, who ran external affairs. She was looking at our advocacy tools and later our legislative and regulatory tracking. She was like, "Cool. What I really want is a way to manage all of my third parties."
+To know how much I'm spending, what they're doing, and track... I was like, "That's great." But because that wasn't what we were doing at the time, I filed that away. So, he was actually reading "The Wolves of K Street" that brought that all back.
+I've been reaching out to different government and external affairs leaders at large companies, many of whom are clients of mine. I'm just picking their brains and seeing a couple of things emerge. One is that there's a lot of money that goes into trade associations, nonprofits, and think tanks.
+It's pretty hard to track. A lot of it is done ad hoc, some is done year on year, but there's a real question about how much of the money is being effectively used.
+Mike Rose | 04:27
+Yeah.
+Jeb Ory | 04:28
+How do we judge the health of the lobbying that we're doing, but also the health of these third parties that we're spending a lot of money on?
+Are they doing what we want them to do? Do we need to lean in more? So, from these different conversations, most of these are being managed in spreadsheets. What I found in my career is that when people are using spreadsheets, there's usually an opportunity to solve some bigger problems with technology.
+Now, with AI, there's a lot that we can do. So, I'll stop there before I bias you too much on what I'm looking at.
+Just get your general take on that problem set and how Comcast does it.
+Mike Rose | 05:07
+So, that is something that we grapple with constantly, and it's hard to say with the new leadership. He's been here for six years now. But historically, it was the same way at AT&T. It was Scott. We didn't have unlimited budgets, but we had pretty much carte blanche to give to whatever group we wanted to.
+We didn't expect a ton out of them. I mean, some of them, we expected a lot. Some, we were like, "Don't attack us or be our friends when we need you.
+Jeb Ory | 05:39
+Yes.
+Mike Rose | 05:44
+But, don't have to think about us when you wake up and when you're going to bed.
+The new leader, who again is no longer new, has recognized that that's just not the right way to look at these relationships anymore. We're in a different time politically. We're in a different time in our business, and that is something that I am actually really focused on right now.
+Jeb Ory | 06:09
+Okay, that's really good.
+Mike Rose | 06:11
+Like you said I was like, "Holy crap, is he reading my mind?" It really is trying to figure out what value we're getting out of these groups and where we might save some money. Where might we pivot some money to other groups that are being helpful?
+We do a lot of things in spreadsheets. We try to track a lot of what they do in quarterly reports, but that doesn't capture every tweet, every blog, every op-ed, but it captures a fair bit.
+The question is, is that very readable? Are you saying these blogs are worth $5,000 each? It's not like that. It is a spreadsheet that shows the group, their profile, whether it's civil rights, center-left, or center-right, here's how much we give them, and here's what they did in the last month.
+That's not a very good way of managing things, but frankly, it's better than we used to do, which was really not tracking at all. We just showed up to all their events, we became their friends, and they did things for us as we needed.
+So, yeah, this is something that would be super interesting to me.
+Jeb Ory | 07:34
+How many different relationships do you have, and I want to get your nomenclature? So, do you use "third parties"? Does that include trade associations or internally? Does that just mean nonprofits and think tanks?
+Mike Rose | 07:48
+Typically non profits and think tanks.
+Jeb Ory | 07:51
+Okay. Do you know approximately how many different relationships you have with trades, nonprofits, and think tanks? Just looking at those hundreds, yes, including state-level trades.
+Mike Rose | 07:59
+I mean, hundreds.
+Jeb Ory | 08:05
+Is that a big multiplier on that number or is it just lots of different federal trades or.
+Mike Rose | 08:10
+No, I mean, there's... If you get into the local side and you want to talk about our community work, it's thousands, but that's not really my team.
+Jeb Ory | 08:14
+Yeah.
+Mike Rose | 08:20
+We leverage those assets when we need something. My team is focused more on the state level and DC players, but it's a large number.
+Jeb Ory | 08:32
+And how many people are on your team that are involved in these relationships? The hundreds.
+Mike Rose | 08:38
+I mean, on the external affairs team, there's five, but then, you know, the public policy team manages a few as well. So I mean, in all end, there's probably like seven.
+Jeb Ory | 08:49
+Seven people managing several hundred relationships, and that's not the core part of their job, right? They're doing other things, too.
+Mike Rose | 08:56
+I would say that the external affairs team is the core part of their drawing.
+Jeb Ory | 08:58
+That is the core part. Okay. What are the different categories of the types of organizations like we have TED. I mean, is it just trade nonprofits, think tanks, or international organizations? What are the different categories for you?
+Mike Rose | 09:15
+Yeah, the difference is that Scott always calls them segments. I think we tend to break them down about the same way.
+So, it really spreads the gamut. Think of any group that takes a public policy position on any issue that can impact our business and has sway with policymakers. If they can have an impact with policymakers, that can have a direct impact on our business. We want to get in there and educate them on issues that are important to us.
+When they take a policy position, we want to make sure they understand the full implications of that policy position on our business. So it's centered, right? You break it down into free market, libertarian, new right.
+There are so many ways you could break this stuff down, but I would tend to say generally, it's going to be academic think tanks, civil rights centers, right? Center-left, like the groups that we're members of, like our trade associations.
+Jeb Ory | 10:20
+Okay. And then what about the trades?
+Mike Rose | 10:30
+So there are only two big ones we're members of, and that's NCTA and NPA.
+Jeb Ory | 10:35
+Okay. Do you ever look at state-level trade associations too, or local?
+Mike Rose | 10:43
+Yeah, there are state cable associations all over the country.
+Jeb Ory | 10:45
+Yeah. Do you. How do you evaluate your return on investment with those with it with the federal trades?
+Mike Rose | 10:53
+That's with the federal. DR we don't I mean, we are just members. I can tell you that. I won't be specific, but they're slow to adapt to modern, changing political times. And certainly we pay close attention to that.
+And obviously, we have a very changing an ever changing industry that's in consolidation. And you know, specific to the cable side, there's basically Comcast, Charter and Cox. And then there's a couple of those smaller companies, you know, like Altis and Cable one. I don't even think Al Tea and Cable one are members of NCTA but charters acquiring Cox so there's consolidation.
+Jeb Ory | 11:41
+Two.
+Mike Rose | 11:41
+So it'll be interesting to see what happens within CTA at a new CEO search for a CEO, hopefully, they'll go through an evolution. But when it comes down to it, that's not really how we think about trade associations.
+It is. You know, we're a member of theirs.
+Jeb Ory | 12:02
+[Laughter].
+Mike Rose | 12:03
+They often operate as though they're their own separate entity. But anyway, I wouldn't say we proactively track their impactfulness.
+Jeb Ory | 12:11
+Yeah. So could you go through the things that you have looked at as you think about calculating ROI for the think tanks and the nonprofits in those segments?
+Mike Rose | 12:31
+It's. not really because each one is different, and your expectations are different for each one. Look, it's not like we pay these groups and they do what we say. It just doesn't work that way.
+It's you know, you support these organizations generally because they're already doing good work on an issue or a set of issues that impact your business, and you want them to continue doing that work.
+But it's really incumbent upon us to make sure that work actually is continuing. Sometimes, an organization may have a great policy expert, but that policy expert moves along,
+and that policy expert was the one focusing on your stuff. Sometimes, you have a long-standing relationship. If that policy expert moves on and they're not doing that work anymore, sometimes that slips with Frank's like, "Well, we've been supporting these groups forever. Why would we stop that?" It could cause an issue if we stopped.
+But on the same time, there are groups that don't agree with you on every single issue. Sometimes, you're working together on one very specific issue. A lot of the times, we don't even financially support these groups. A lot of the times, it's just relationships that are built over years of seeing each other and building those trusted relationships where you become friendly.
+It's a lot like, frankly, the way lobbyists work these days. It's really relationship-based. I mean, it's not as I think a lot of people want to believe that this is a very yucky pay-to-play type of operation, and I think some companies do it that way.
+That's just not the way we have done it. Ours has been more of a long-term relationship development type of thing, but while at the same time, recognizing recently that we need to see more of an ROI.
+Jeb Ory | 14:44
+Yes. Do you have an idea of approximately how much you spend each year? Just sort of the magnitude on third and.
+Mike Rose | 14:58
+That's something I definitely cannot share unless you're on India.
+Jeb Ory | 15:00
+Yeah, okay, happy to do that if we move forward, but, in so I was looking at, like, you know, a couple of large retailers.
+Mike Rose | 15:06
+Okay.
+Jeb Ory | 15:12
+I've talked to one. One of the very large retailers has about 1,300 trades that they're involved with. Now, some of those are professional trade associations. Their marketing team may belong to the digital marketing association, right? We're not focused on those as much as the ones at the state level that are focused around policy. I was talking with ATT, which belongs to hundreds, 500 to 700 trade associations.
+So we're seeing across the board. I was talking with someone who works in the oil and gas industry for one of the bigs. They had a relative like you, they had a relatively finite number of federal trade associations.
+But there are a lot of state-level ones that they were working with, and they made a strategic decision a couple of years ago to pull out of a couple of the big trades because there was a divergence in where their plans were more downstream from where the company was.
+Mike Rose | 16:09
+Hey.
+Jeb Ory | 16:13
+So I've been... I can share with you a really early mockup just to get your reaction and interest to see if we think of this. So. Okay, can you see this? Okay, can you see that?
+Mike Rose | 16:34
+Just popped up.
+Jeb Ory | 16:35
+Okay, all right, so and I'm looking for feedback.
+Mike Rose | 16:35
+Yup.
+Jeb Ory | 16:39
+This is not this is definitely not set in stone. This is just based on some initial mulling.
+But what part of my vision is a dashboard that shows everything? So you have the total number of organizations, the investment. We're really playing around with this concept of ROI score and health status. I want those to happen. Part of what I think a piece of ROI is going to be, Mike, is heavy surveying.
+So going through and surveying the relationship owners and talking to them to understand where their assessment of the relationship is. So we have some surveys and draft questions and things that we can ask.
+Then, you can then see your top organizations. The idea here is that you can see all the ORGs. So you can scroll through and there are other reporting that you can actually see in one place. We probably would add in a relationship owner, right?
+So you know who on your team is responsible for each one. Then, if you want to go into an organization, you could then see who the relationship owner is, what your historical investment has been.
+It's not just the... For trades especially, it's not just the annual dues. It may be the sponsorship that you do. Then, "Hey, there's a speaking role or..." I was talking with an executive at a tobacco company, and he had a cat.
+He had a calendar in a spreadsheet of 100 different events his team was supposed to hit throughout the course of the year. You know, so they're supposed to go and... He needs to pull briefing books and things like that and pull executives in for certain... If there's a key state that things are coming up in...
+So you have a level of detail. Then we would look at it. I view this as a portfolio, so you could dig deeper into the portfolio. This is a cool concept. I want to sort of...
+So you can upload your company documents, and we would analyze them against the publicly shared policies or white papers from the different stakeholder organizations you have. So you could see how close your internal policies or policy goals are reflected in the external published materials from your different stakeholder organizations?
+Mike Rose | 19:07
+Wow.
+Would that be done through using AI?
+Jeb Ory | 19:17
+Yeah.
+Mike Rose | 19:18
+That is that's very interesting.
+Jeb Ory | 19:21
+Yeah. What would you want to see in that? How would you use that data.
+Mike Rose | 19:31
+I don't know, I'm not sure yet. I mean, this is the first time I'm even considering something like this.
+Jeb Ory | 19:33
+Yeah, [Laughter] fair.
+Mike Rose | 19:39
+Yeah, I mean, one, it would just be good to have a solid understanding of where we agree with these third parties, and we know where we can approach them on and where we can stay away from certain issues they're going to be against us.
+Jeb Ory | 19:47
+He.
+Mike Rose | 19:54
+Or three. Where we need to put some work into trying to alter their positions on a.
+Jeb Ory | 20:00
+Right.
+Mike Rose | 20:00
+On something?
+Jeb Ory | 20:01
+Yep, and you have some evidence now. There's this event calendar, so you can see... This is a couple of things. First of all, there's an administrative component.
+Mike Rose | 20:05
+Yeah.
+Jeb Ory | 20:14
+So like, when did you give the money last year? And then is it on an annual cadence so you can do some budgeting that doesn't just exist in ledgers so you can see when your memberships are due?
+Then it's like a calendar view. Where I envision this going to is the ability to actually tag people on your team and assign people to different events and things. Then this is cool. We would have real-time alerts on what these different parties are doing and publishing.
+So you could then see, "Hey, this third party just came out with a white paper." Then you would run it through the analysis to see, "How is that aligned with our priorities?" Yes, no, maybe.
+Then, are there other events that are popping up? Then, on the reporting, this is all very evolving, but the executive summary would be something that you could give to go upstream. "Hey, here's our overall analysis of what our current situation is with our third parties and trades." There'd be a policy alignment across all.
+So you could get some kind of high-level heuristics about how your policies are interacting with the policies of other folks in your third parties. Then we'd make some recommendations. This is the kind of thing where the feedback is really important because we're going to base a lot of this
+on... Well, we get first-party data from the surveys we do of your team, but then a lot of the other stuff we'd get would be from third-party analysis of their policies against your policies. There's second-party data in there about getting more information on your historical spin and things like that.
+But all that together would go into our engine that would make a recommendation on, "Okay, this is what you're spending right now. Here's where we think you could reallocate." Then we would go more in depth on that. You could review it and say, "Yes, this makes sense." "No, this doesn't make sense." "This is when we want to explore more." But.
+Mike Rose | 22:34
+That's awesome. Okay, I love it, I really like it. When did you start working on this?
+Jeb Ory | 22:40
+Pretty recently.
+Mike Rose | 22:42
+Yeah, so that's very interesting.
+Jeb Ory | 22:42
+Yeah, very recently. Yeah, sure.
+Mike Rose | 22:48
+Okay. I'd like to stay in touch with you on this as you put some more thought into it. I'd probably like to bring in another member of my team on this as well to get his thoughts.
+Then let's just stay in contact. I want to hear about how you're progressing. I may want to have you do another presentation to a couple of other folks.
+Jeb Ory | 23:17
+Yeah. absolutely. What would the best next step be on that front?
+Mike Rose | 23:26
+I don't know. You tell me. I'm not sure how far along you are. I wouldn't mind doing another call like this for that other team member so he can get up to speed.
+Jeb Ory | 23:33
+Okay.
+Mike Rose | 23:36
+He is ten times smarter than me. It would be great to have him aware of this.
+Maybe it. Look, we're going through some internal changes too. So this is actually timely. And we're putting some real thought into how we get the biggest bang out of our buck with these third party groups.
+And we should have you guys considered looking at what we call intergovernmental associations, groups like NGA D yeah, in CSL ALEC.
+Jeb Ory | 24:08
+DGARG Absolutely. I'll make sure that we add some of those in the next cut of the demo.
+But yeah, those come up a lot, and I know that there's a lot of spin that goes in there, and it's.
+Mike Rose | 24:27
+Yeah, I mean, there's a lot of... No, they're not... They used to be that. That's kind of high rolled into the job I currently have, but they are part of our overall advocacy machine.
+Jeb Ory | 24:28
+Are those under your purview?
+Y.
+Mike Rose | 24:42
+We don't utilize them the way we used to. If we were pushing an issue here in DC, we would go to ALEC and in CSL and push resolutions to go through the process to call on Congress to do those under your don't utilize them the way we used to. If we were pushing an issue here in DC, we would go to ALEC and in CSL and push resolutions to go through the process to call on Congress to do something. You don't really do that anymore.
+It's more of a relationship opportunity. But, it would still be good to know where these groups are.
+Jeb Ory | 25:05
+Yeah, we can track those as well. That's a great point.
+Mike Rose | 25:10
+Okay. Okay.
+Jeb Ory | 25:11
+Well, I mean, we could put something on the calendar two weeks out, if you think that would make sense.
+Mike Rose | 25:16
+Yeah. Yeah. Why don't we do that? I'll reach out to Bashira, the colleague I want to introduce you to.
+Jeb Ory | 25:20
+Okay.
+Mike Rose | 25:25
+His name is Tim McCann.
+I'll introduce you to him. Do something similar with him and we can discuss internally. But I really like the idea and I think this is actually very timely for us.
+Jeb Ory | 25:37
+Great.
+Mike Rose | 25:38
+So anyway, I'll get cracking on asking the sure to set that up and we'll reconnect in a few weeks.
+Jeb Ory | 25:45
+Okay, thanks a lot, Mike, appreciate you.
+Mike Rose | 25:46
+Great, Jet.
+Jeb Ory | 25:47
+All right, yeah, you got it.
+Mike Rose | 25:47
+Allright'll right, I'll see you around the neighborhood.

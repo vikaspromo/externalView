@@ -1,0 +1,330 @@
+Jeb Ory | 01:19
+Hi Karen, you too, how are you doing?
+Karen Goldfeder | 01:21
+I mean, you jet, it's good to see you. I'm great. I'm in Italy, so I'm living my best life.
+Jeb Ory | 01:29
+You taking this call from Italy?
+Karen Goldfeder | 01:32
+I am, but don't worry, my husband is Italian, so we try to spend the bulk of July here.
+Jeb Ory | 01:37
+Okay, so you're working okay, what part of Italy?
+Karen Goldfeder | 01:39
+So see, I'm not on vacation.
+Yeah, so he's from the north, specifically Bergamo, which is just outside of Milan.
+Jeb Ory | 01:50
+Okay.
+Karen Goldfeder | 01:50
+But now we are down by the beach in Tuscany, so.
+Jeb Ory | 01:55
+Lovely. We were in Italy two weeks ago for a wedding up in Sestriere in Majori, and then we did a couple. We took the kids and did a couple of days in Chicaera.
+Karen Goldfeder | 02:00
+Nice.
+Jeb Ory | 02:07
+We actually did the hike from Vernassa to Monte Roso, and then a couple of days in Rome, and we did all the tours, it was a lot of fun.
+Karen Goldfeder | 02:09
+How long were to see now?
+Jeb Ory | 02:16
+Great trip. It wasn't too hot, so, yeah, I know we had a blast.
+Karen Goldfeder | 02:17
+I love that. Yeah, the past few days, it's been brutally hot. But you get some shade, you get a sprit. It's not too bad.
+Jeb Ory | 02:30
+We had some of the best meals we've had a lot of excellent squid-stuffed pasta and stuff.
+Karen Goldfeder | 02:35
+Yeah, always been there.
+Jeb Ory | 02:36
+I'll tell you something fun. So, the other day, my wife came back from the market with all these squid. Because we were, like, kind of inspired. We didn't make squiding, but, like, we, like, actually, like, did the whole, like, extract the squid.
+You know, like it's. Have you done that before? So it's like.
+Karen Goldfeder | 02:53
+Yeah, once we did it with octopus. I'm assuming it's the same thing. There's a structure or there's substance to it.
+Jeb Ory | 03:03
+You, like, have to pull out like you have the top of the squid that gets cut off into the calamari. You have to, like, pull out the inwards. Then you have to, like, chop off the part of the in.
+You know. So it was like, kind of fun, super messy, and like, the squinting looked to be like. It was like the eyeballs kind of like. Anyway, so, like, we got black, it was like we was very inspired by our time in Italy.
+So and I saw you work to do something.
+Karen Goldfeder | 03:27
+I love this.
+Jeb Ory | 03:31
+Did you overlap with Jeff Platt?
+Karen Goldfeder | 03:35
+Yes, that is not.
+Jeb Ory | 03:35
+Yeah, my wife.
+Karen Goldfeder | 03:36
+I thought you were going to say... But yes, always happy to talk about Jeff Black, he's the best. How do you know Jeff?
+Jeb Ory | 03:42
+My wife went to grad school with him. I just got to know him through her and over time, so. Yeah, who did you think I was going to say.
+Karen Goldfeder | 03:49
+Now? He is my God now. I'm literally picturing his face and I cannot remember his name. He was on something strategic, then I think he was at Meta, then he went to... I think he's now at Airbnb.
+I hate that I am not remembering it.
+Jeb Ory | 04:04
+Okay.
+Karen Goldfeder | 04:04
+I'm gonna take out my phone and figure out who it is. I feel like, my God, this is one of those moments where I can't continue this conversation if I don't... Did you work with Sean? Gannon at all?
+Jeb Ory | 04:19
+Yeah, absolutely, yeah. He was one of our employees at FundAction. Yeah, did you work with Sean? That's right, yes, Sean, yes, that's great.
+Karen Goldfeder | 04:23
+Yes. No, I was like, yes. So, Jeff was at the start of my do-something time. Sean was at the end of it. But all I can say is this is a really good company to keep. So.
+Jeb Ory | 04:36
+Sen I forgot he went to do something.
+So, I'll give you like a quick two minutes of who I am and what I'm doing. So, I had previously co-founded Bill, and we sold Phone to Action, which made software for grassroots advocacy campaigns. In our latter years, we had a full suite like government affairs package as well for alleged Reds tracking and stuff like that. Robin Hood was one of our clients. We had over 1,000 clients.
+It started off in the nonprofit sector, but we had 25% of the Fortune 100 when we merged a quorum in the end of 2022, we went to about $25 million in annual recurring revenue.
+Karen Goldfeder | 05:05
+Eight.
+Jeb Ory | 05:09
+It's a good-sized business, about 180 employees.
+It's a good company, good run. The last couple of years, I've been doing a lot of advisory work, working with early-stage companies. I really like zero to one stuff. I've been consulting with very cool, early-stage AI-first companies, which is what I'm doing right now.
+But my passion is in creating and founding. I was reading a book called "The Wolves of K Street." Have you heard that? It's new. It's a treatise on lobbying. It's like the origins of lobbying over the last fifty years.
+About how. I mean, it's kind of like lobbying's a bad name, bad word. But I read it, and I got a great business idea. Then it talks about the downfall of Manafort and Stone and the Podesta group.
+It's actually fascinating. I definitely recommend it. But I was reminded of a conversation I'd had with a friend who became our client at Google and Alphabet. She was running external affairs at the time, and we were showing her legislative and regulatory tracking stuff.
+Right? Just like, "That's cool. What I really want is something that tracks all the third parties that we're engaged with, the investments that we're making, the commitments that we have, that they have, and what their output is."
+I'm like, "I already have something. I wasn't looking for a new idea, but the book reminded me of that because it talked about a lot of the nature of the campaigns that all of our clients would do."
+You know how you have all these different parties, the associations, the third parties, the think tanks, that are assets, right? They are entities that do their own work independently and sometimes coordinated with different companies to run advocacy campaigns.
+I was like, "What this external affairs function is, is one that was always on the periphery of what we would do when we'd deal with advocacy people and government affairs people." Their jobs are highly idiosyncratic,
+but there wasn't, as I was aware of it, a dedicated tech or solution for people who work in external affairs and third party management. So I'm just reaching out to folks, trying to have some kind of baseline conversation to find out what your day-to-day is like, where the challenges are, with the goal of finding out if there's an opportunity here or not to create dedicated software for this specific user use case?
+Karen Goldfeder | 07:50
+Yeah. I'm not sure if we're talking about the same thing, but I'm very excited about what you're doing. And maybe when I answer, when I sort of just start chatting, you'll say, Karen, not at all what I was thinking, but happy to get that information.
+Jeb Ory | 07:58
+Sure. Great.
+Karen Goldfeder | 08:06
+But all the dots. I can share a little bit about how our external affairs function, and I oversee what we call stakeholder engagement, which we were bifurcating into stakeholder engagement
+and community engagement. Community engagement is saying, "How are we being the best corporate citizen we can be in the communities where we operate?" This is not something we do at all, but I always use the example of community engagement. Should we sponsor the local softball team for high school?
+It's much more about, "How are we pillars of the community?" Still always tied to our own, most logical verticals of financial education and technology inclusion. Stakeholders take those same pillars but say, "Who are the organizations that are doing this at an elevated level who can have an outsized influence on the landscape in which we will operate and that consumers will exist over the coming years, decades, and generations?"
+So, my portfolio can be everyone from the National Association of Securities Professionals, a trade association that's very closely aligned with our business, to behemoths like Operation Hope, a nonprofit group operating at a tremendously influential scale, sitting on a lot of different White House committees in the previous administration and things like that, but then overseeing the World Economic Forum relationships and things like that with different think tanks where we're actually getting some thought leadership out of that and some knowledge.
+So, that's my side of the business where it's saying, "How can we look beyond our customers and think who is going to be creating the environment in which we operate?" And how can we be active in those conversations in a non-lobbying way?
+Jeb Ory | 09:59
+Yeah.
+Karen Goldfeder | 10:02
+So thinking about the soft power that we're building in that space, am I still talking the same y.
+Jeb Ory | 10:08
+So I'm one hundred percent on stakeholder engagement. Yeah, like yes, that is what I'm interested in. And like what?
+And my I think my thesis is that well, my hypothesis is that the existing tools that are built for stakeholder engagement are were really generally built from a government affairs perspective and then shopped and like not designed from the ground up.
+Like if you're going to build something from scratch for managing these different types of relationships. You mentioned trades, nonprofits, you know, things like the probably DGA RG you know all the different like quasi governmental ones as well.
+Karen Goldfeder | 10:45
+Yes.
+Jeb Ory | 10:54
+You may not have what Quorum built for stakeholder engagement, for example, but I don't know the answer to that.
+Karen Goldfeder | 11:00
+And now yeah.
+Jeb Ory | 11:01
+Like. that's part of what I'm asking.
+Karen Goldfeder | 11:04
+And so, I am not an entrepreneur, so I'm going to tell you exactly what I would want someone to build.
+Jeb Ory | 11:10
+That's what I want to hear.
+Karen Goldfeder | 11:10
+So you have the phone to action.
+Jeb Ory | 11:11
+Yes.
+Karen Goldfeder | 11:13
+And understand the value proposition and what that's doing.
+Jeb Ory | 11:13
+Yeah.
+Karen Goldfeder | 11:17
+Then on the other side of that relationship management spectrum, you just have the standard CRMs, the Salesforce, the HubSpots, all of those. What I want someone to build for me.
+So, please, Jeb, will you build this? This is something that gets the ripple effect because that's the thing that's most important with stakeholders. And so let's take this stakeholder out of it and just talk about what the ripple effect means for me on an internal space.
+So I can see Chloe, my manager. I get to see her calendar. So I can look at her calendar and go, "You're talking with Jeb tomorrow?" Actually, if you're talking with Jeb, can you mention this one thing? I'm so curious about what's happening with...
+But to be able to have those questions so that I can say, "Who are the people in my immediate circle?" Or to use that notion of the spheres of influence, "Who's in my immediate sphere? Who's in their sphere? Who's there?" What's that ripple effect?
+How can I use it more intentionally? I don't even know how we get this information. I don't know how it all pulls together. But thinking about that and the things that it can pull on is certainly public media, social media, all of those different things, but what committees are they sitting on? What policies are they engaging around all of these different things so that I can do better outreach and be more intentional?
+Instead of saying, "I think you'd care about this," say, "I'd love to see that you're doing that." The hardest part about the stakeholder work is I don't know what I don't know.
+Jeb Ory | 13:02
+No.
+Karen Goldfeder | 13:02
+And the relationship has to be more informed than a standard donor, and the lobbying can't be as transactional as a phone to action.
+Jeb Ory | 13:10
+Yeah, right away, yeah, okay, yeah, I totally understand it.
+Karen Goldfeder | 13:11
+So soft power exists in information. I have no idea if that's what you're trying to do, but that's the missing piece. The hardest part of my work is the stakeholder mapping and the relationship ripple effect.
+Jeb Ory | 13:24
+Okay, that's really helpful. Can you ask about the... So, approximately, how many different third parties are you interacting with?
+Entities like trades and nonprofits. Like what's the in size? That is your like swimming pool, two.
+Karen Goldfeder | 13:41
+I mean, if you think about the entire external affairs portfolio that we oversee, not government, not customers, between prospects, partners, and previously engaged partners,
+we're upwards of a hundred, so we're not massive, but it's enough that it's tough.
+Jeb Ory | 13:58
+Okay.
+Karen Goldfeder | 14:04
+And think that number gets bigger if you start thinking about individuals rather than entities.
+Jeb Ory | 14:07
+And how many trade associations are you guys duping members of? Do you know if that goes through external affairs or if it goes through the or.
+Karen Goldfeder | 14:13
+I do not have that answer for you.
+So, a little bit of both.
+Jeb Ory | 14:19
+Or both?
+Karen Goldfeder | 14:22
+And that's why it's tricky.
+Jeb Ory | 14:23
+Yeah.
+Karen Goldfeder | 14:23
+So some go for government affairs, some are with external affairs. They're in a variety of different places. Based on, frankly, what we need out of the membership and what the organization needs from us.
+Jeb Ory | 14:35
+What about nonprofits or think tanks?
+Karen Goldfeder | 14:39
+So that's the bulk of my portfolio. So, when I say that we've got about 100 or so that we're either cultivating or connected with, give or take, that's one hundred.
+Jeb Ory | 14:43
+Okay, yeah.
+Karen Goldfeder | 14:51
+And that's looking at universities, community engagement, and the organizations, these stakeholder groups that could be C-6s or C-3s and then those think tanks.
+Jeb Ory | 14:56
+Yes. And what percentage of those are you financially supporting versus just, like, engaging with 25% 50%, like 10%?
+Karen Goldfeder | 15:11
+O not sure I have that number off the top of my head, but I think we're probably looking at 50% of that, maybe or less.
+Jeb Ory | 15:17
+Like, what's the. I just order of magnitude is really what I'm looking at.
+So do you use a CRM or something to keep track of all of those? What's the... What does your management system look like for those nonprofits and things?
+Karen Goldfeder | 15:38
+Yes. And it is a Google spreadsheet.
+Jeb Ory | 15:41
+Yes.
+Okay, yeah.
+Karen Goldfeder | 15:43
+And the main reason we actually built out a whole CRM function on Salesforce.
+But Salesforce is too bulky for the number of prospects that we have. I am a monster with database-based systems because I will not put information in if I don't know how to get it out. And Salesforce just didn't have the proper reporting that I'm sure it did.
+But for the activities that we wanted to do, the relationship management of it all, it just didn't work out. We couldn't figure out how to get the right reports to make it better than an Excel spreadsheet.
+Jeb Ory | 16:21
+And those are qualitative engagements. We met, we talked about the like how detailed did your work get or your the notes that you wanted to keep get.
+Karen Goldfeder | 16:27
+Your engagement.
+Jeb Ory | 16:35
+I mean, are they custom? Per like. Or. Or is it more general? Like.
+Karen Goldfeder | 16:40
+So my whole system is that I have a spreadsheet that is the entire portfolio that we all feed into. Then each partner has its own call notes. So that essentially the spreadsheet is home-based, but then it spirals out to the more detailed notes elsewhere. The things that ultimately I want to be able to track, and Salesforce couldn't help me with, was I wanted to be able to have alerts on lapsed communication so I don't have to think constantly about when was the last time I talked with this someone?
+Jeb Ory | 17:03
+Yeah.
+Karen Goldfeder | 17:14
+I want something that's more intuitive, which I know Salesforce does, but it's always great app.
+It's something that can just help with reminders on that, but then the standard marketing reminders of one of these group conferences. How can I remember to be top of mind for them? So that's just good sales stuff.
+Then the last one is the connectivity and the webbing of it all. How does this person go there? How does that person move around? Particularly, where Salesforce just didn't fit the bill is all of these leadership. We're looking at a very tiny world when you think about fintech and the organizations that align with it.
+So it's musical chairs. Where it really sucked in Salesforce was when one person left one organization and went to the other one, and we weren't nimble enough to follow that. That's the best part of the web to say, "This executive director is actually now an industry."
+I don't actually care where she works, but I care about who she is or I don't care about the individual. I care about the organization and being able to be nimble enough to know what's the primary reason for cultivation and how do you honor that?
+Jeb Ory | 18:27
+Related questions. So when you think about your investment, is that something that goes through your organization or does it go through a nonprofit affiliated with the organization?
+Karen Goldfeder | 18:42
+Our giving is through the corporate entity.
+Jeb Ory | 18:44
+Okay. All right. Do you personally process those, or what is the paper flow on that? When do you get an invoice? Do you guys say, "Hey, we're going to make it"? What's just the finance flow, if there is one?
+Karen Goldfeder | 19:01
+And what I'm happy to share that, but sort of want to make sure that I'm not getting too on the record about things.
+Jeb Ory | 19:08
+Sure. Yeah.
+Karen Goldfeder | 19:08
+How will this be used?
+Jeb Ory | 19:09
+I'm trying to figure out if there's a business for me to start and solve some of these problems. I yeah, it's just for my usage.
+Karen Goldfeder | 19:17
+So the answer that I would say is we actually go through the standard corporate procurement flow.
+Jeb Ory | 19:21
+Okay, yeah, okay, yes.
+Karen Goldfeder | 19:23
+So we don't have our own way through.
+Onboarding a donation is the same flow as onboarding a new fraud vendor.
+Jeb Ory | 19:34
+Okay. And then for Trade Asso, I know that this is maybe not as much under your purview, but is Trade Association membership and sponsorship the same, or is that does it have the same flow as a donation or is that separate?
+Karen Goldfeder | 19:47
+Everything goes through our procurement team.
+Jeb Ory | 19:49
+Okay. Okay.
+Karen Goldfeder | 19:54
+And one of the things that's just important for you to possibly be aware of at least the best of my knowledge. Part of that is just because, as a financial services organization, we want to be really very diligent on where our money is going, how we're tracking in and out, because we, of course, want to make sure that we are being incredible stewards of our money, not supporting fraud, any of that stuff.
+So giving money is a lot more difficult just because of all of those external and internal controls.
+Jeb Ory | 20:20
+Of course. Yeah, I mean, I've been talking to, like you, the Walmarts, the world, and the PMI, and these large companies that have tons, hundreds, or thousands of trade association memberships. Some of them, like Philip Morris, is completely siloed.
+Every single thing that goes out has to be signed off by an executive. Whereas with Walmart, because Walmart is so big, they belong to 1,300 different associations and government affairs.
+Karen Goldfeder | 20:52
+Interesting.
+Jeb Ory | 21:00
+And broader policy team has some of them, but there are so many business-specific associations that they belong to that, you know, a footwear product will be a part of the footwear trade association, right? The business unit director is making that decision.
+So it would be like if, you know, if you had separate products, separate business units that, I mean, may or maybe your marketing team might belong to, like the Digital Marketing Association, for example.
+Karen Goldfeder | 21:28
+Then. I wouldn't even know about thatm.
+Jeb Ory | 21:31
+That's just a little bit of insight of what I've been learning. What I'm wondering about, and I don't know if this has legs or not. I hear you on the ripple. I'm thinking about that as a dashboard that would have all your partners, the investment level. There's a page or a tab for upcoming conferences that shows it on a calendar that gives you the ability to tag people. Or you can create instant briefings based on who's going to be at that event. You can create a briefing book to give to, let's say, if you have an executive flying in for something. You need to be able to tell them who they should talk to, who's going to be there. These are some of the things that I've been teasing out.
+But does that seem like it would be useful? Or is the spreadsheet all you need and you don't need anything else? More involved.
+Karen Goldfeder | 22:32
+The spreadsheet is not all I need, but it feels like home.
+Jeb Ory | 22:36
+Right?
+Karen Goldfeder | 22:36
+But I mean, for me and this might not be true for other people.
+Jeb Ory | 22:43
+Two.
+Karen Goldfeder | 22:43
+For me, the financial commitment and things like that aren't as necessary because that happens once a year or twice a year.
+Jeb Ory | 22:49
+Okay. Yeah.
+Karen Goldfeder | 22:53
+So I'm looking and I think as you mentioned, this sort of crystallizes another problem. I want a database that's much more active and dynamic and appreciates the ongoing flow of activity rather than the donation because that happens once. I don't know if you've ever heard of or looked at Tesura.
+Jeb Ory | 23:17
+No.
+Karen Goldfeder | 23:19
+Nor should you.
+So Tesserra, from my theater days, was a relationship management system that had two pathways.
+Jeb Ory | 23:26
+Okay, yeah.
+Karen Goldfeder | 23:29
+So it might have eventually been bought by Razor's Edge, but half of it was donation and half of it was theater, and they did a pretty good integration of here's the fundraising side of things, and you're not going to pay attention to that.
+Jeb Ory | 23:39
+Two.
+Karen Goldfeder | 23:45
+364 days a year.
+But I think that's something that's that I long for is more dynamic information.
+Jeb Ory | 23:55
+Okay, so what is. What are the. I mean, I think this is part of the ripple effect, but what is the dynamic information that you'd want to see in it like Arabian in your spreadsheet?
+Karen Goldfeder | 24:03
+And this is where I meet.
+Jeb Ory | 24:05
+What is it? Just what are the column headers of your spreadsheet? Could you walk me through some of those?
+Karen Goldfeder | 24:09
+No, those are the boring ones.
+Jeb Ory | 24:11
+Okay.
+Karen Goldfeder | 24:11
+No, if I was creating something dynamic, I'd want a column that was relevant news, and then each different partner, it would populate what's happening.
+I think that's the thing, I can't handle Google alerts on a hundred different prospects, but I do want to know where they are, what they're doing, and who they are plugged in with. A good example is one of the nonprofits we partner with. I got invited to an event that they were doing with a member of Congress that we would have loved to be with.
+My instinct was, "So am I finding out about this now?" I wish I knew that this was happening with enough time for me to say, "Hey, could we be a sponsor or can we get a call?" I want a little bit more visibility into the global landscape so that I can know it's... I just want the updated news.
+Then I want there to actually pull out when this organization is meeting with a member of Congress or when this organization is doing XYZ thing. That's the information that, if we had the analysts to constantly be monitoring and building, we'd have.
+But we're a lean team, and that's the kind of stuff that I'd love to have a resource to pull out.
+Jeb Ory | 25:41
+Yeah. That makes sense.
+Karen Goldfeder | 25:47
+And you excuse me one moment, I think my entire family got locked out. You're going to hear a bunch of loud Italians in two seconds.
+I will be right back.
+Jeb Ory | 25:53
+Okay, no, I didn't hear it, so maybe they were quietly loud.
+Karen Goldfeder | 26:11
+Sorry about that.
+Jeb Ory | 26:17
+Okay, that's really cool. I mean, there's a company, the company I'm consulting with right now, that makes news clipping software, so they have a very robust solution for media monitoring.
+I probably could help with some of that. Okay, so that's one, and we just go for a couple more minutes if that's okay, but so I got the real-time alerts. What else? What else would you want to be tracking? Is that the core of the dynamism you're talking about?
+Karen Goldfeder | 26:51
+Done more of it.
+Jeb Ory | 26:53
+Y all right. On the events, how much of your world is going to these events that they are having and representing.
+Karen Goldfeder | 26:57
+But I think other things that would be useful are before we engage with any partner publicly, we actually internally do a risk assessment. And it's just understanding their brand and things like that and having that Dynassm to be able to know, have they done something that would risk our bread or would elevate it?
+But yeah, I think it's the bulk of all of my stuff is how can I get more real-time information on who I'm working with beyond just what they share with me so that I can be more strategic about what I ask them about how we align? All of that stuff.
+Jeb Ory | 27:42
+Okay.
+Karen Goldfeder | 27:42
+Probably not that much. And I'm fearing my own judgment as I say that part of the work is being in those spaces, but it's a bit more of us creating events and posting them together than going out.
+Jeb Ory | 27:52
+Yeah, okay, I totally get it.
+Karen Goldfeder | 27:56
+And again, that's just the time. But, I mean, and this is not information that we could have, but with AI, we probably could have who is selling to events and looking at photos posted online and doing the social media.
+There's information to be had.
+Jeb Ory | 28:18
+So your key gap is getting more insight on your world, knowing what people are doing at a given time that may intersect with your organization's priorities and being able to act on that information really quickly.
+That's okay, awesome.
+Karen Goldfeder | 28:36
+That would be outstanding.
+Jeb Ory | 28:40
+Karen, thank you so much for your time, I really appreciate it. It's great to meet you.
+Karen Goldfeder | 28:45
+Yeah, no, it's great to meet you. I always love having these chats. As I mentioned, please keep this as inspiration off the record, but I would love to hear how this evolves, and I'm curious.
+Jeb Ory | 28:52
+One hundred percent. Yeah, you got it, I'll keep you posting.
+Karen Goldfeder | 29:01
+Yeah, so thank you.
+Jeb Ory | 29:02
+Okay, thank you, take care, bye.
+Karen Goldfeder | 29:03
+All right, take care. Bye.
