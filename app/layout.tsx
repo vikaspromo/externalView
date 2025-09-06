@@ -1,11 +1,6 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata = {
-  title: 'ExternalView - Stakeholder Intelligence Platform',
-  description: 'Enterprise stakeholder intelligence and relationship management platform',
+  title: 'ExternalView',
+  description: 'Stakeholder Intelligence Platform',
 }
 
 export default function RootLayout({
@@ -15,11 +10,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
-          {children}
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   )
 }

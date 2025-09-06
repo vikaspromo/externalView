@@ -1,17 +1,9 @@
 export default function HomePage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          ExternalView
-        </h1>
-        <p className="text-xl text-gray-600">
-          Stakeholder Intelligence Platform
-        </p>
-        <p className="text-sm text-green-600 mt-4">
-          ✅ Deployment is working!
-        </p>
-      </div>
+    <div style={{ padding: '50px', textAlign: 'center' }}>
+      <h1>ExternalView Works!</h1>
+      <p>If you can see this, the deployment is successful.</p>
+      <p>Framework: Next.js 14 with App Router</p>
     </div>
   )
 }
