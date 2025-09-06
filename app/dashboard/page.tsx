@@ -102,27 +102,42 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Banner */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-8 mb-8 text-white">
+          <h1 className="text-3xl font-bold mb-2">
+            Welcome back, {user.user_metadata?.full_name || user.email?.split('@')[0]}!
+          </h1>
+          <p className="text-xl opacity-95">
+            {allowedUser.company}
+          </p>
+          <p className="text-sm opacity-75 mt-2">
+            Stakeholder Intelligence Platform
+          </p>
+        </div>
+
         {/* User Info Card */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h2>
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Account Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="text-sm text-gray-900 mt-1">{allowedUser.email}</dd>
+              <dt className="text-sm font-medium text-gray-500">Full Name</dt>
+              <dd className="text-sm text-gray-900 mt-1 font-medium">
+                {user.user_metadata?.full_name || user.email?.split('@')[0]}
+              </dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Company</dt>
-              <dd className="text-sm text-gray-900 mt-1">{allowedUser.company}</dd>
+              <dd className="text-sm text-gray-900 mt-1 font-medium">{allowedUser.company}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-gray-500">Email</dt>
+              <dd className="text-sm text-gray-900 mt-1">{allowedUser.email}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-gray-500">Member Since</dt>
               <dd className="text-sm text-gray-900 mt-1">
                 {new Date(allowedUser.created_at).toLocaleDateString()}
               </dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Status</dt>
-              <dd className="text-sm text-green-600 mt-1 font-medium">Active</dd>
             </div>
           </div>
         </div>
