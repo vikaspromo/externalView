@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
       
       if (allowedUser && !error) {
         // User is authorized, redirect to dashboard
-        return NextResponse.redirect(new URL('/dashboard', requestUrl.origin))
+        return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
       } else {
         // User is not authorized, redirect to home (will show access denied)
-        return NextResponse.redirect(new URL('/', requestUrl.origin))
+        return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
       }
     }
   }
 
   // If no code or session, redirect to home
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
+  return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
 }
