@@ -90,31 +90,26 @@ export default function DashboardPage() {
 
   const loadOrganizations = async (clientUuid: string) => {
     try {
-      // Try to get organizations for this client
-      // Assuming there's a client_uuid field on organizations table
-      const { data: orgsData, error: orgsError } = await supabase
-        .from('organizations')
-        .select('*')
+      // Get organizations for this client using relationship_summary view
+      const { data: relationshipData, error: relationshipError } = await supabase
+        .from('relationship_summary')
+        .select('client_uuid, org_uuid, org_name, org_type, total_spend, status, owner, renewal_date, alignment_score, priority')
         .eq('client_uuid', clientUuid)
-        .limit(50)
       
-      if (orgsError) {
-        console.error('Error fetching organizations:', orgsError)
-        // If the query fails, try without client filter (for testing)
-        const { data: allOrgsData, error: allOrgsError } = await supabase
-          .from('organizations')
-          .select('*')
-          .limit(10)
-        
-        if (allOrgsError) {
-          console.error('Error fetching all organizations:', allOrgsError)
-        } else {
-          console.log('Loaded all organizations (no client filter):', allOrgsData)
-          setOrganizations(allOrgsData || [])
-        }
+      if (relationshipError) {
+        console.error('Error fetching from relationship_summary:', relationshipError)
+        // No fallback - organizations are only shown through client relationships
+        setOrganizations([])
       } else {
-        console.log('Loaded organizations for client:', clientUuid, orgsData)
-        setOrganizations(orgsData || [])
+        // Transform relationship data to organization format for display
+        const transformedOrgs = relationshipData?.map(rel => ({
+          id: rel.org_uuid || '',
+          name: rel.org_name || '',
+          description: `${rel.org_type || ''} | Status: ${rel.status || ''} | Owner: ${rel.owner || ''}`,
+          created_at: '',
+          updated_at: ''
+        })) || []
+        setOrganizations(transformedOrgs)
       }
     } catch (error) {
       console.error('Error in loadOrganizations:', error)
@@ -228,9 +223,6 @@ export default function DashboardPage() {
                         {org.description}
                       </p>
                     )}
-                    <div className="text-xs text-gray-500">
-                      Created {new Date(org.created_at).toLocaleDateString()}
-                    </div>
                   </div>
                 ))}
               </div>
