@@ -14,9 +14,9 @@ export async function GET(request: NextRequest) {
     const { data: { session } } = await supabase.auth.getSession()
     
     if (session?.user) {
-      // Check if user is in allowed_users table
+      // Check if user is in users table
       const { data: allowedUser, error } = await supabase
-        .from('allowed_users')
+        .from('users')
         .select('*')
         .eq('email', session.user.email)
         .single()

@@ -15,9 +15,9 @@ export default function HomePage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setUser(session.user)
-        // Check if user is in allowed_users table
+        // Check if user is in users table
         const { data: allowedUser } = await supabase
-          .from('allowed_users')
+          .from('users')
           .select('*')
           .eq('email', session.user.email)
           .single()

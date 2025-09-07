@@ -14,10 +14,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/', request.url))
   }
 
-  // If user has session but is accessing dashboard, verify they're in allowed_users
+  // If user has session but is accessing dashboard, verify they're in users
   if (request.nextUrl.pathname.startsWith('/dashboard') && session) {
     const { data: allowedUser } = await supabase
-      .from('allowed_users')
+      .from('users')
       .select('*')
       .eq('email', session.user.email)
       .single()

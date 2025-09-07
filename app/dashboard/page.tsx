@@ -3,12 +3,14 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { AllowedUser, Organization } from '@/lib/supabase/types'
+import { User, Organization, Client } from '@/lib/supabase/types'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
-  const [allowedUser, setAllowedUser] = useState<AllowedUser | null>(null)
+  const [userData, setUserData] = useState<User | null>(null)
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [clients, setClients] = useState<Client[]>([])
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const supabase = createClientComponentClient()
@@ -25,19 +27,19 @@ export default function DashboardPage() {
 
         setUser(session.user)
         
-        // Get user details from allowed_users table
-        const { data: allowedUserData } = await supabase
-          .from('allowed_users')
+        // Get user details from users table
+        const { data: userData } = await supabase
+          .from('users')
           .select('*')
           .eq('email', session.user.email)
           .single()
         
-        if (!allowedUserData) {
+        if (!userData) {
           router.push('/')
           return
         }
         
-        setAllowedUser(allowedUserData)
+        setUserData(userData)
         
         // Get organizations (placeholder for now)
         const { data: orgsData } = await supabase
@@ -46,6 +48,23 @@ export default function DashboardPage() {
           .limit(10)
         
         setOrganizations(orgsData || [])
+
+        // Get all clients from clients table
+        const { data: clientsData, error: clientsError } = await supabase
+          .from('clients')
+          .select('uuid, name')
+          .order('name', { ascending: true })
+        
+        if (clientsError) {
+          console.error('Error fetching clients:', clientsError)
+        } else {
+          console.log('Clients data:', clientsData)
+          setClients(clientsData || [])
+          // Set first client as default selected client
+          if (clientsData && clientsData.length > 0) {
+            setSelectedClient(clientsData[0])
+          }
+        }
       } catch (error) {
         console.error('Error loading dashboard:', error)
         router.push('/')
@@ -70,7 +89,7 @@ export default function DashboardPage() {
     )
   }
 
-  if (!user || !allowedUser) {
+  if (!user || !userData) {
     return null
   }
 
@@ -102,6 +121,37 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Client Selection Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            {selectedClient && (
+              <h1 className="text-2xl font-bold text-gray-900">
+                {selectedClient.name}
+              </h1>
+            )}
+          </div>
+          {userData?.client_uuid === '36fee78e-9bac-4443-9339-6f53003d3250' && (
+            <div className="flex-shrink-0">
+              <select
+                id="client-select"
+                value={selectedClient?.uuid || ''}
+                onChange={(e) => {
+                  const client = clients.find(c => c.uuid === e.target.value)
+                  setSelectedClient(client || null)
+                }}
+                className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white"
+              >
+                <option value="">Select a client...</option>
+                {clients.map((client) => (
+                  <option key={client.uuid} value={client.uuid}>
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
 
         {/* Organizations Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
