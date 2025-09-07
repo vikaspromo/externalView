@@ -401,7 +401,7 @@ export default function DashboardPage() {
         <div className="flex justify-between items-center mb-8">
           <div>
             {selectedClient && (
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold tracking-wide text-gray-900">
                 {selectedClient.name}
               </h1>
             )}
@@ -588,8 +588,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Relationship Management Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Relationship Management</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Relationship Management</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].relationship_mgmt && Object.keys(orgDetails[org.id].relationship_mgmt).length > 0 ? (
                                       <div className="space-y-2">
@@ -610,8 +610,8 @@ export default function DashboardPage() {
                                   )}
                                 </div>
                                 
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Deliverables</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Deliverables</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].deliverables && Object.keys(orgDetails[org.id].deliverables).length > 0 ? (
                                       <div className="space-y-2">
@@ -633,8 +633,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Strategic Alignment Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Strategic Alignment</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Strategic Alignment</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].strategic_alignment && Object.keys(orgDetails[org.id].strategic_alignment).length > 0 ? (
                                       <div className="space-y-2">
@@ -656,8 +656,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Events Engagement Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Events Engagement</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Events Engagement</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].events_engagement && Object.keys(orgDetails[org.id].events_engagement).length > 0 ? (
                                       <div className="space-y-2">
@@ -679,8 +679,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Classification Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Classification</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Classification</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].classification && Object.keys(orgDetails[org.id].classification).length > 0 ? (
                                       <div className="space-y-2">
@@ -702,8 +702,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Intelligence Monitoring Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Intelligence Monitoring</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Intelligence Monitoring</h4>
                                   {orgDetails[org.id] ? (
                                     (orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring) && 
                                     Object.keys(orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring || {}).length > 0 ? (
@@ -726,8 +726,8 @@ export default function DashboardPage() {
                                 </div>
                                 
                                 {/* Historical Context Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Historical Context</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Historical Context</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].historical_context && Object.keys(orgDetails[org.id].historical_context).length > 0 ? (
                                       <div className="space-y-2">
