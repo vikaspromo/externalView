@@ -1,5 +1,16 @@
 {
-  "name": "My Codespace",
+  "name": "ExternalView Codespace",
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "postCreateCommand": "bash .devcontainer/setup-claude.sh"
+  "forwardPorts": [3000],
+  "postCreateCommand": "bash .devcontainer/setup-claude.sh && npm install",
+  "postStartCommand": "/workspaces/externalView/startup.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  }
 }

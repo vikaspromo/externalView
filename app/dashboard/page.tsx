@@ -101,10 +101,16 @@ export default function DashboardPage() {
         // No fallback - organizations are only shown through client relationships
         setOrganizations([])
       } else {
-        // Transform relationship data to organization format for display
+        // Keep the full relationship data for table display
         const transformedOrgs = relationshipData?.map(rel => ({
           id: rel.org_uuid || '',
           name: rel.org_name || '',
+          type: rel.org_type || '',
+          priority: rel.priority || 0,
+          alignment_score: rel.alignment_score || 0,
+          total_spend: rel.total_spend || 0,
+          status: rel.status || '',
+          owner: rel.owner || '',
           description: `${rel.org_type || ''} | Status: ${rel.status || ''} | Owner: ${rel.owner || ''}`,
           created_at: '',
           updated_at: ''
@@ -211,20 +217,69 @@ export default function DashboardPage() {
           
           <div className="p-6">
             {organizations.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {organizations.map((org) => (
-                  <div
-                    key={org.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-primary-300 hover:shadow-sm transition-all cursor-pointer"
-                  >
-                    <h3 className="font-medium text-gray-900 mb-2">{org.name}</h3>
-                    {org.description && (
-                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                        {org.description}
-                      </p>
-                    )}
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Organization
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Priority
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Alignment Score
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Budget
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {organizations.map((org) => (
+                      <tr key={org.id} className="hover:bg-gray-50 cursor-pointer">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {org.name}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {org.type || 'Organization'}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            org.priority === 1 ? 'bg-red-100 text-red-800' :
+                            org.priority === 2 ? 'bg-yellow-100 text-yellow-800' :
+                            org.priority === 3 ? 'bg-green-100 text-green-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            Priority {org.priority || '-'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="text-sm font-medium text-gray-900">
+                              {org.alignment_score ? `${org.alignment_score}%` : '-'}
+                            </div>
+                            {org.alignment_score && (
+                              <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-primary-600 h-2 rounded-full" 
+                                  style={{ width: `${Math.min(org.alignment_score, 100)}%` }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {org.total_spend ? `$${org.total_spend.toLocaleString()}` : '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ) : (
               <div className="text-center py-12">
