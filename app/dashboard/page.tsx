@@ -2,8 +2,11 @@
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { User, Organization, Client } from '@/lib/supabase/types'
+
+type SortField = 'name' | 'priority' | 'alignment_score' | 'total_spend'
+type SortDirection = 'asc' | 'desc'
 
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
@@ -13,6 +16,8 @@ export default function DashboardPage() {
   const [selectedClientUuid, setSelectedClientUuid] = useState<string>('')
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [sortField, setSortField] = useState<SortField>('name')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -127,6 +132,45 @@ export default function DashboardPage() {
     router.push('/')
   }
 
+  // Sorting logic
+  const sortedOrganizations = useMemo(() => {
+    const sorted = [...organizations].sort((a, b) => {
+      let aValue: any = a[sortField]
+      let bValue: any = b[sortField]
+
+      // Handle null/undefined values
+      if (aValue == null) aValue = sortField === 'priority' ? 999 : 0
+      if (bValue == null) bValue = sortField === 'priority' ? 999 : 0
+
+      // String comparison for name
+      if (sortField === 'name') {
+        aValue = aValue.toLowerCase()
+        bValue = bValue.toLowerCase()
+        return sortDirection === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue)
+      }
+
+      // Numeric comparison for other fields
+      return sortDirection === 'asc' 
+        ? aValue - bValue 
+        : bValue - aValue
+    })
+    
+    return sorted
+  }, [organizations, sortField, sortDirection])
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      // Toggle direction if clicking the same field
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Set new field with appropriate default direction
+      setSortField(field)
+      setSortDirection(field === 'priority' ? 'asc' : 'desc')
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -221,22 +265,62 @@ export default function DashboardPage() {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Organization
+                      <th 
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSort('name')}
+                      >
+                        <div className="flex items-center">
+                          Organization
+                          {sortField === 'name' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Priority
+                      <th 
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSort('priority')}
+                      >
+                        <div className="flex items-center">
+                          Priority
+                          {sortField === 'priority' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Alignment Score
+                      <th 
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSort('alignment_score')}
+                      >
+                        <div className="flex items-center">
+                          Alignment Score
+                          {sortField === 'alignment_score' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Budget
+                      <th 
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSort('total_spend')}
+                      >
+                        <div className="flex items-center">
+                          Budget
+                          {sortField === 'total_spend' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
                       </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {organizations.map((org) => (
+                    {sortedOrganizations.map((org) => (
                       <tr key={org.id} className="hover:bg-gray-50 cursor-pointer">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
