@@ -491,15 +491,165 @@ export default function DashboardPage() {
                                   )}
                                 </div>
                                 
-                                {/* Placeholder for additional cards */}
+                                {/* Relationship Management Card */}
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Political Intelligence</h4>
-                                  <p className="text-sm text-gray-500">Coming soon...</p>
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Relationship Management</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].relationship_mgmt && Object.keys(orgDetails[org.id].relationship_mgmt).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].relationship_mgmt).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No relationship management data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading relationship data...</p>
+                                  )}
                                 </div>
                                 
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Business Development</h4>
-                                  <p className="text-sm text-gray-500">Coming soon...</p>
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Deliverables</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].deliverables && Object.keys(orgDetails[org.id].deliverables).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].deliverables).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No deliverables data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading deliverables...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Strategic Alignment Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Strategic Alignment</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].strategic_alignment && Object.keys(orgDetails[org.id].strategic_alignment).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].strategic_alignment).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No strategic alignment data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading strategic alignment...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Events Engagement Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Events Engagement</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].events_engagement && Object.keys(orgDetails[org.id].events_engagement).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].events_engagement).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No events engagement data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading events data...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Classification Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Classification</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].classification && Object.keys(orgDetails[org.id].classification).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].classification).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No classification data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading classification...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Intelligence Monitoring Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Intelligence Monitoring</h4>
+                                  {orgDetails[org.id] ? (
+                                    (orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring) && 
+                                    Object.keys(orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring || {}).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No intelligence monitoring data available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading intelligence data...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Historical Context Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Historical Context</h4>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].historical_context && Object.keys(orgDetails[org.id].historical_context).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].historical_context).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No historical context available</p>
+                                    )
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading historical data...</p>
+                                  )}
                                 </div>
                               </div>
                             </td>
