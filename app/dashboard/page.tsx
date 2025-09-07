@@ -562,11 +562,11 @@ export default function DashboardPage() {
                         </tr>
                         {expandedRows.has(org.id) && (
                           <tr>
-                            <td colSpan={4} className="px-6 py-4 bg-gray-50">
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <td colSpan={4} className="px-6 py-6 bg-gray-50">
+                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* Financial Admin Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Financial Administration</h4>
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Financial Administration</h4>
                                   {orgDetails[org.id] ? (
                                     orgDetails[org.id].financial_admin && Object.keys(orgDetails[org.id].financial_admin).length > 0 ? (
                                       <div className="space-y-2">
