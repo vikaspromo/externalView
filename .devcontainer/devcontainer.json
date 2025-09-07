@@ -1,4 +1,5 @@
 {
   "name": "My Codespace",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
   "postCreateCommand": "bash .devcontainer/setup-claude.sh"
 }
