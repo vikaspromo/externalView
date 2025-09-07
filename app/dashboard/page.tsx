@@ -60,9 +60,13 @@ export default function DashboardPage() {
         } else {
           console.log('Clients data:', clientsData)
           setClients(clientsData || [])
-          // Set first client as default selected client
-          if (clientsData && clientsData.length > 0) {
-            setSelectedClient(clientsData[0])
+          
+          // Set the user's client as the selected client based on their client_uuid
+          if (clientsData && userData.client_uuid) {
+            const userClient = clientsData.find(client => client.uuid === userData.client_uuid)
+            if (userClient) {
+              setSelectedClient(userClient)
+            }
           }
         }
       } catch (error) {
