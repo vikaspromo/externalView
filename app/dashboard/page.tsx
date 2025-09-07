@@ -3,7 +3,7 @@
 import React from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useCallback } from 'react'
 import { User, Organization, Client } from '@/lib/supabase/types'
 
 type SortField = 'name' | 'priority' | 'alignment_score' | 'total_spend'
@@ -185,14 +185,7 @@ export default function DashboardPage() {
     getUser()
   }, [supabase, router])
 
-  // Load organizations when selectedClientUuid changes
-  useEffect(() => {
-    if (selectedClientUuid) {
-      loadOrganizations(selectedClientUuid)
-    }
-  }, [selectedClientUuid])
-
-  const loadOrganizations = async (clientUuid: string) => {
+  const loadOrganizations = useCallback(async (clientUuid: string) => {
     try {
       // Get organizations for this client using relationship_summary view
       const { data: relationshipData, error: relationshipError } = await supabase
@@ -224,7 +217,14 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Error in loadOrganizations:', error)
     }
-  }
+  }, [supabase])
+
+  // Load organizations when selectedClientUuid changes
+  useEffect(() => {
+    if (selectedClientUuid) {
+      loadOrganizations(selectedClientUuid)
+    }
+  }, [selectedClientUuid, loadOrganizations])
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
