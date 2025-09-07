@@ -9,6 +9,102 @@ import { User, Organization, Client } from '@/lib/supabase/types'
 type SortField = 'name' | 'priority' | 'alignment_score' | 'total_spend'
 type SortDirection = 'asc' | 'desc'
 
+// Helper function to format currency values
+const formatCurrency = (value: number | string): string => {
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (isNaN(num)) return String(value)
+  return `$${num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
+
+// Helper function to check if a field name is likely a currency field
+const isCurrencyField = (key: string): boolean => {
+  const currencyKeywords = [
+    'amount', 'spend', 'budget', 'cost', 'price', 'fee', 'revenue', 
+    'dues', 'payment', 'sponsorship', 'value', 'salary', 'income',
+    'expense', 'total', 'subtotal', 'balance', 'credit', 'debit'
+  ]
+  const lowerKey = key.toLowerCase()
+  return currencyKeywords.some(keyword => lowerKey.includes(keyword))
+}
+
+// Helper function to check if a field name is likely a date field
+const isDateField = (key: string): boolean => {
+  const dateKeywords = [
+    'date', 'time', 'created', 'updated', 'modified', 'deadline',
+    'due', 'expires', 'renewal', 'start', 'end', 'birth', 'joined',
+    'last', 'next', 'scheduled', 'completed', 'signed'
+  ]
+  const lowerKey = key.toLowerCase()
+  return dateKeywords.some(keyword => lowerKey.includes(keyword))
+}
+
+// Helper function to format dates
+const formatDate = (value: string | Date): string => {
+  try {
+    const date = value instanceof Date ? value : new Date(value)
+    // Check if date is valid
+    if (isNaN(date.getTime())) return String(value)
+    
+    // Format as "Month Day, Year" (e.g., "January 15, 2024")
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  } catch {
+    return String(value)
+  }
+}
+
+// Helper function to format field values with proper type handling
+const formatFieldValue = (key: string, value: any): string => {
+  if (value === null || value === undefined) return '-'
+  
+  // Handle arrays - join items with comma, no brackets or quotes
+  if (Array.isArray(value)) {
+    if (value.length === 0) return '-'
+    // For arrays of objects, stringify each object
+    if (value.some(item => typeof item === 'object' && item !== null)) {
+      return value.map(item => 
+        typeof item === 'object' ? JSON.stringify(item) : String(item)
+      ).join(', ')
+    }
+    // For simple arrays, capitalize first letter of each item and join
+    return value.map(item => {
+      const str = String(item)
+      return str.charAt(0).toUpperCase() + str.slice(1)
+    }).join(', ')
+  }
+  
+  // Check if it's a date field and the value looks like a date
+  if (isDateField(key) && typeof value === 'string') {
+    // Check if it looks like a date (ISO format, or contains date separators)
+    if (value.match(/^\d{4}-\d{2}-\d{2}/) || value.match(/\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4}/)) {
+      return formatDate(value)
+    }
+  }
+  
+  // Check if it's a currency field and the value is numeric
+  if (isCurrencyField(key) && (typeof value === 'number' || !isNaN(parseFloat(value)))) {
+    return formatCurrency(value)
+  }
+  
+  // Handle objects (but not arrays, which are already handled above)
+  if (typeof value === 'object' && value instanceof Date) {
+    return formatDate(value)
+  } else if (typeof value === 'object') {
+    return JSON.stringify(value, null, 2)
+  }
+  
+  // Handle booleans
+  if (typeof value === 'boolean') {
+    return value ? 'Yes' : 'No'
+  }
+  
+  // Default to string representation
+  return String(value)
+}
+
 export default function DashboardPage() {
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<User | null>(null)
@@ -279,8 +375,8 @@ export default function DashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                ExternalView
+              <h1 className="text-3xl font-bold text-red-600">
+                EV
               </h1>
             </div>
             <div className="flex items-center space-x-4">
@@ -461,7 +557,7 @@ export default function DashboardPage() {
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {org.total_spend ? `$${org.total_spend.toLocaleString()}` : '-'}
+                            {org.total_spend ? `$${formatCurrency(org.total_spend)}` : '-'}
                           </td>
                         </tr>
                         {expandedRows.has(org.id) && (
@@ -478,7 +574,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -501,7 +597,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -523,7 +619,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -546,7 +642,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -569,7 +665,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -592,7 +688,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -616,7 +712,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
@@ -639,7 +735,7 @@ export default function DashboardPage() {
                                           <div key={key} className="text-sm">
                                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
                                             <span className="ml-2 text-gray-600">
-                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                              {formatFieldValue(key, value)}
                                             </span>
                                           </div>
                                         ))}
