@@ -10,6 +10,7 @@ export default function DashboardPage() {
   const [userData, setUserData] = useState<User | null>(null)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [clients, setClients] = useState<Client[]>([])
+  const [selectedClientUuid, setSelectedClientUuid] = useState<string>('')
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
@@ -56,13 +57,16 @@ export default function DashboardPage() {
           console.log('Clients data:', clientsData)
           setClients(clientsData || [])
           
-          // Set the user's client as the selected client based on their client_uuid
-          if (clientsData && userData.client_uuid) {
-            const userClient = clientsData.find(client => client.uuid === userData.client_uuid)
-            if (userClient) {
-              setSelectedClient(userClient)
-              // Load organizations for this client
-              loadOrganizations(userClient.uuid)
+          // Set the user's client UUID as the default selected client UUID
+          if (userData.client_uuid) {
+            setSelectedClientUuid(userData.client_uuid)
+            
+            // Also set the selectedClient object for display purposes
+            if (clientsData) {
+              const userClient = clientsData.find(client => client.uuid === userData.client_uuid)
+              if (userClient) {
+                setSelectedClient(userClient)
+              }
             }
           }
         }
@@ -77,12 +81,12 @@ export default function DashboardPage() {
     getUser()
   }, [supabase, router])
 
-  // Load organizations when selected client changes
+  // Load organizations when selectedClientUuid changes
   useEffect(() => {
-    if (selectedClient?.uuid) {
-      loadOrganizations(selectedClient.uuid)
+    if (selectedClientUuid) {
+      loadOrganizations(selectedClientUuid)
     }
-  }, [selectedClient?.uuid])
+  }, [selectedClientUuid])
 
   const loadOrganizations = async (clientUuid: string) => {
     try {
@@ -176,10 +180,17 @@ export default function DashboardPage() {
             <div className="flex-shrink-0">
               <select
                 id="client-select"
-                value={selectedClient?.uuid || ''}
+                value={selectedClientUuid}
                 onChange={(e) => {
-                  const client = clients.find(c => c.uuid === e.target.value)
+                  const newClientUuid = e.target.value
+                  setSelectedClientUuid(newClientUuid)
+                  
+                  // Also update selectedClient object for display purposes
+                  const client = clients.find(c => c.uuid === newClientUuid)
                   setSelectedClient(client || null)
+                  
+                  // Dashboard will automatically refresh via useEffect on selectedClientUuid change
+                  // This will reload organizations and any other client-specific data
                 }}
                 className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white"
               >
