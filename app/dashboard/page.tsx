@@ -41,13 +41,8 @@ export default function DashboardPage() {
         
         setUserData(userData)
         
-        // Get organizations (placeholder for now)
-        const { data: orgsData } = await supabase
-          .from('organizations')
-          .select('*')
-          .limit(10)
-        
-        setOrganizations(orgsData || [])
+        // Initialize organizations as empty - will be loaded after client selection
+        setOrganizations([])
 
         // Get all clients from clients table
         const { data: clientsData, error: clientsError } = await supabase
@@ -66,6 +61,8 @@ export default function DashboardPage() {
             const userClient = clientsData.find(client => client.uuid === userData.client_uuid)
             if (userClient) {
               setSelectedClient(userClient)
+              // Load organizations for this client
+              loadOrganizations(userClient.uuid)
             }
           }
         }
@@ -79,6 +76,46 @@ export default function DashboardPage() {
 
     getUser()
   }, [supabase, router])
+
+  // Load organizations when selected client changes
+  useEffect(() => {
+    if (selectedClient?.uuid) {
+      loadOrganizations(selectedClient.uuid)
+    }
+  }, [selectedClient?.uuid])
+
+  const loadOrganizations = async (clientUuid: string) => {
+    try {
+      // Try to get organizations for this client
+      // Assuming there's a client_uuid field on organizations table
+      const { data: orgsData, error: orgsError } = await supabase
+        .from('organizations')
+        .select('*')
+        .eq('client_uuid', clientUuid)
+        .limit(50)
+      
+      if (orgsError) {
+        console.error('Error fetching organizations:', orgsError)
+        // If the query fails, try without client filter (for testing)
+        const { data: allOrgsData, error: allOrgsError } = await supabase
+          .from('organizations')
+          .select('*')
+          .limit(10)
+        
+        if (allOrgsError) {
+          console.error('Error fetching all organizations:', allOrgsError)
+        } else {
+          console.log('Loaded all organizations (no client filter):', allOrgsData)
+          setOrganizations(allOrgsData || [])
+        }
+      } else {
+        console.log('Loaded organizations for client:', clientUuid, orgsData)
+        setOrganizations(orgsData || [])
+      }
+    } catch (error) {
+      console.error('Error in loadOrganizations:', error)
+    }
+  }
 
   const handleSignOut = async () => {
     await supabase.auth.signOut()
