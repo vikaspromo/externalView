@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useMemo } from 'react'
@@ -189,24 +190,73 @@ export default function DashboardPage() {
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
-      // Fetch from client_org_relationships to get financial_admin and other JSONB data
+      // Fetch from client_org_relationships
       const { data, error } = await supabase
         .from('client_org_relationships')
-        .select('financial_admin, political_intelligence, business_development, stakeholder_list')
+        .select('*')
         .eq('client_uuid', selectedClientUuid)
         .eq('org_uuid', orgId)
-        .single()
+        .maybeSingle()
       
       if (error) {
-        console.error('Error fetching org details:', error)
+        // Handle specific RLS errors
+        if (error.code === '42501' || error.message?.includes('policy')) {
+          console.error('RLS Policy Error: User does not have permission to access this data')
+          console.error('Details:', error)
+          
+          // Set a user-friendly error in the details
+          setOrgDetails(prev => ({
+            ...prev,
+            [orgId]: { 
+              error: 'Permission denied. Please contact your administrator.',
+              errorDetails: error.message 
+            }
+          }))
+        } else if (error.code === 'PGRST116') {
+          console.warn('No matching records found for this organization')
+          setOrgDetails(prev => ({
+            ...prev,
+            [orgId]: { 
+              error: 'No data available for this organization',
+              isEmpty: true 
+            }
+          }))
+        } else {
+          console.error('Database error:', error)
+          setOrgDetails(prev => ({
+            ...prev,
+            [orgId]: { 
+              error: 'Failed to load organization details',
+              errorDetails: error.message 
+            }
+          }))
+        }
       } else if (data) {
+        console.log('Successfully fetched organization details')
         setOrgDetails(prev => ({
           ...prev,
           [orgId]: data
         }))
+      } else {
+        // No data and no error means the record doesn't exist
+        console.log('No data exists for this organization')
+        setOrgDetails(prev => ({
+          ...prev,
+          [orgId]: { 
+            isEmpty: true,
+            message: 'No details available yet for this organization' 
+          }
+        }))
       }
     } catch (error) {
-      console.error('Error in fetchOrgDetails:', error)
+      console.error('Unexpected error in fetchOrgDetails:', error)
+      setOrgDetails(prev => ({
+        ...prev,
+        [orgId]: { 
+          error: 'An unexpected error occurred',
+          errorDetails: String(error) 
+        }
+      }))
     }
   }
 
@@ -360,8 +410,8 @@ export default function DashboardPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {sortedOrganizations.map((org) => (
-                      <>
-                        <tr key={org.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => toggleRowExpansion(org.id)}>
+                      <React.Fragment key={org.id}>
+                        <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => toggleRowExpansion(org.id)}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
                               <button className="mr-3 text-gray-400 hover:text-gray-600">
@@ -415,23 +465,27 @@ export default function DashboardPage() {
                           </td>
                         </tr>
                         {expandedRows.has(org.id) && (
-                          <tr key={`${org.id}-expanded`}>
+                          <tr>
                             <td colSpan={4} className="px-6 py-4 bg-gray-50">
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {/* Financial Admin Card */}
                                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                                   <h4 className="text-sm font-semibold text-gray-900 mb-3">Financial Administration</h4>
-                                  {orgDetails[org.id]?.financial_admin ? (
-                                    <div className="space-y-2">
-                                      {Object.entries(orgDetails[org.id].financial_admin).map(([key, value]) => (
-                                        <div key={key} className="text-sm">
-                                          <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                          <span className="ml-2 text-gray-600">
-                                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-                                          </span>
-                                        </div>
-                                      ))}
-                                    </div>
+                                  {orgDetails[org.id] ? (
+                                    orgDetails[org.id].financial_admin && Object.keys(orgDetails[org.id].financial_admin).length > 0 ? (
+                                      <div className="space-y-2">
+                                        {Object.entries(orgDetails[org.id].financial_admin).map(([key, value]) => (
+                                          <div key={key} className="text-sm">
+                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                            <span className="ml-2 text-gray-600">
+                                              {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">No financial data available</p>
+                                    )
                                   ) : (
                                     <p className="text-sm text-gray-500">Loading financial data...</p>
                                   )}
@@ -451,7 +505,7 @@ export default function DashboardPage() {
                             </td>
                           </tr>
                         )}
-                      </>
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>
