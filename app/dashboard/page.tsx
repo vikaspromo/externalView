@@ -18,6 +18,8 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
+  const [orgDetails, setOrgDetails] = useState<Record<string, any>>({})
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -171,6 +173,43 @@ export default function DashboardPage() {
     }
   }
 
+  const toggleRowExpansion = async (orgId: string) => {
+    const newExpandedRows = new Set(expandedRows)
+    if (newExpandedRows.has(orgId)) {
+      newExpandedRows.delete(orgId)
+    } else {
+      newExpandedRows.add(orgId)
+      // Fetch detailed data if not already loaded
+      if (!orgDetails[orgId] && selectedClientUuid) {
+        await fetchOrgDetails(orgId)
+      }
+    }
+    setExpandedRows(newExpandedRows)
+  }
+
+  const fetchOrgDetails = async (orgId: string) => {
+    try {
+      // Fetch from client_org_relationships to get financial_admin and other JSONB data
+      const { data, error } = await supabase
+        .from('client_org_relationships')
+        .select('financial_admin, political_intelligence, business_development, stakeholder_list')
+        .eq('client_uuid', selectedClientUuid)
+        .eq('org_uuid', orgId)
+        .single()
+      
+      if (error) {
+        console.error('Error fetching org details:', error)
+      } else if (data) {
+        setOrgDetails(prev => ({
+          ...prev,
+          [orgId]: data
+        }))
+      }
+    } catch (error) {
+      console.error('Error in fetchOrgDetails:', error)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -321,46 +360,98 @@ export default function DashboardPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {sortedOrganizations.map((org) => (
-                      <tr key={org.id} className="hover:bg-gray-50 cursor-pointer">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {org.name}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {org.type || 'Organization'}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            org.priority === 1 ? 'bg-red-100 text-red-800' :
-                            org.priority === 2 ? 'bg-yellow-100 text-yellow-800' :
-                            org.priority === 3 ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            Priority {org.priority || '-'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="text-sm font-medium text-gray-900">
-                              {org.alignment_score ? `${org.alignment_score}%` : '-'}
-                            </div>
-                            {org.alignment_score && (
-                              <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
-                                <div 
-                                  className="bg-primary-600 h-2 rounded-full" 
-                                  style={{ width: `${Math.min(org.alignment_score, 100)}%` }}
-                                />
+                      <>
+                        <tr key={org.id} className="hover:bg-gray-50 cursor-pointer" onClick={() => toggleRowExpansion(org.id)}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <button className="mr-3 text-gray-400 hover:text-gray-600">
+                                {expandedRows.has(org.id) ? (
+                                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                ) : (
+                                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                )}
+                              </button>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">
+                                  {org.name}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {org.type || 'Organization'}
+                                </div>
                               </div>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {org.total_spend ? `$${org.total_spend.toLocaleString()}` : '-'}
-                        </td>
-                      </tr>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              org.priority === 1 ? 'bg-red-100 text-red-800' :
+                              org.priority === 2 ? 'bg-yellow-100 text-yellow-800' :
+                              org.priority === 3 ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              Priority {org.priority || '-'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="text-sm font-medium text-gray-900">
+                                {org.alignment_score ? `${org.alignment_score}%` : '-'}
+                              </div>
+                              {org.alignment_score && (
+                                <div className="ml-2 w-16 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-primary-600 h-2 rounded-full" 
+                                    style={{ width: `${Math.min(org.alignment_score, 100)}%` }}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {org.total_spend ? `$${org.total_spend.toLocaleString()}` : '-'}
+                          </td>
+                        </tr>
+                        {expandedRows.has(org.id) && (
+                          <tr key={`${org.id}-expanded`}>
+                            <td colSpan={4} className="px-6 py-4 bg-gray-50">
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Financial Admin Card */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Financial Administration</h4>
+                                  {orgDetails[org.id]?.financial_admin ? (
+                                    <div className="space-y-2">
+                                      {Object.entries(orgDetails[org.id].financial_admin).map(([key, value]) => (
+                                        <div key={key} className="text-sm">
+                                          <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
+                                          <span className="ml-2 text-gray-600">
+                                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-sm text-gray-500">Loading financial data...</p>
+                                  )}
+                                </div>
+                                
+                                {/* Placeholder for additional cards */}
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Political Intelligence</h4>
+                                  <p className="text-sm text-gray-500">Coming soon...</p>
+                                </div>
+                                
+                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                                  <h4 className="text-sm font-semibold text-gray-900 mb-3">Business Development</h4>
+                                  <p className="text-sm text-gray-500">Coming soon...</p>
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
