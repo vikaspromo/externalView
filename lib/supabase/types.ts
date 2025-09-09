@@ -26,14 +26,3 @@ export interface Client {
   uuid: string
   name: string
 }
-
-export interface StakeholderRelationship {
-  id: string
-  organization_id: string
-  stakeholder_name: string
-  role?: string
-  contact_info?: string
-  notes?: string
-  created_at: string
-  updated_at: string
-}
