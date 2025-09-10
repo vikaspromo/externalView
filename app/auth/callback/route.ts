@@ -15,19 +15,32 @@ export async function GET(request: NextRequest) {
     
     if (session?.user) {
       // Check if user is in users table
-      const { data: allowedUser, error } = await supabase
+      const { data: allowedUser, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('email', session.user.email)
         .single()
       
-      if (allowedUser && !error) {
+      if (allowedUser && !userError) {
         // User is authorized, redirect to dashboard
         return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
-      } else {
-        // User is not authorized, redirect to home (will show access denied)
-        return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
       }
+      
+      // If not in users table, check if they're an admin
+      const { data: adminUser, error: adminError } = await supabase
+        .from('user_admins')
+        .select('*')
+        .eq('email', session.user.email)
+        .eq('active', true)
+        .single()
+      
+      if (adminUser && !adminError) {
+        // Admin is authorized, redirect to dashboard
+        return NextResponse.redirect(new URL('/dashboard', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
+      }
+      
+      // User is not authorized in either table, redirect to home (will show access denied)
+      return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin))
     }
   }
 

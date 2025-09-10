@@ -24,6 +24,19 @@ export default function HomePage() {
         
         if (allowedUser) {
           router.push('/dashboard')
+          return
+        }
+        
+        // If not in users table, check if they're an admin
+        const { data: adminUser } = await supabase
+          .from('user_admins')
+          .select('*')
+          .eq('email', session.user.email)
+          .eq('active', true)
+          .single()
+        
+        if (adminUser) {
+          router.push('/dashboard')
         }
       }
     }
