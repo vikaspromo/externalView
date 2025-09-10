@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 
-type SortField = 'name' | 'alignment_score' | 'total_spend'
+type SortField = 'name' | 'alignment_score' | 'total_spend' | 'renewal_date'
 type SortDirection = 'asc' | 'desc'
 
 // Helper function to format currency values
@@ -217,6 +217,7 @@ export default function DashboardPage() {
           total_spend: rel.annual_total_spend || 0,
           status: '', // status column was removed in migration
           owner: rel.relationship_owner || '',
+          renewal_date: rel.renewal_date || '',
           description: `Owner: ${rel.relationship_owner || 'Unassigned'}`,
           created_at: '',
           updated_at: ''
@@ -457,6 +458,19 @@ export default function DashboardPage() {
                           )}
                         </div>
                       </th>
+                      <th 
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => handleSort('renewal_date')}
+                      >
+                        <div className="flex items-center">
+                          Renewal Date
+                          {sortField === 'renewal_date' && (
+                            <span className="ml-1">
+                              {sortDirection === 'asc' ? '↑' : '↓'}
+                            </span>
+                          )}
+                        </div>
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -504,49 +518,22 @@ export default function DashboardPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {org.total_spend ? formatCurrency(org.total_spend) : '-'}
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {org.renewal_date ? formatDate(org.renewal_date) : '-'}
+                          </td>
                         </tr>
                         {expandedRows.has(org.id) && (
                           <tr>
-                            <td colSpan={4} className="px-6 py-6 bg-gray-50">
+                            <td colSpan={5} className="px-6 py-6 bg-gray-50">
                               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                 <h4 className="text-base font-semibold text-gray-900 mb-4">Relationship Details</h4>
                                 {orgDetails[org.id] ? (
                                   <div className="space-y-3">
-                                    {/* Annual Total Spend */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Annual Total Spend:</span>
-                                      <span className="text-gray-600">
-                                        {orgDetails[org.id]?.annual_total_spend 
-                                          ? formatCurrency(orgDetails[org.id]!.annual_total_spend!) 
-                                          : '-'}
-                                      </span>
-                                    </div>
-                                    
                                     {/* Relationship Owner */}
                                     <div className="flex items-start">
                                       <span className="font-medium text-gray-700 w-40">Relationship Owner:</span>
                                       <span className="text-gray-600">
                                         {orgDetails[org.id]?.relationship_owner || '-'}
-                                      </span>
-                                    </div>
-                                    
-                                    {/* Renewal Date */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Renewal Date:</span>
-                                      <span className="text-gray-600">
-                                        {orgDetails[org.id]?.renewal_date 
-                                          ? formatDate(orgDetails[org.id]!.renewal_date!) 
-                                          : '-'}
-                                      </span>
-                                    </div>
-                                    
-                                    {/* Last Contact Date */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Last Contact:</span>
-                                      <span className="text-gray-600">
-                                        {orgDetails[org.id]?.last_contact_date 
-                                          ? formatDate(orgDetails[org.id]!.last_contact_date!) 
-                                          : '-'}
                                       </span>
                                     </div>
                                     
@@ -558,26 +545,6 @@ export default function DashboardPage() {
                                           ? orgDetails[org.id]!.key_external_contacts!.join(', ')
                                           : '-'}
                                       </span>
-                                    </div>
-                                    
-                                    {/* Policy Alignment Score */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Alignment Score:</span>
-                                      <div className="flex items-center">
-                                        {orgDetails[org.id]?.policy_alignment_score !== null && orgDetails[org.id]?.policy_alignment_score !== undefined ? (
-                                          <>
-                                            <span className="text-gray-600 mr-3">{orgDetails[org.id]!.policy_alignment_score}%</span>
-                                            <div className="w-32 bg-gray-200 rounded-full h-2">
-                                              <div 
-                                                className="bg-primary-600 h-2 rounded-full" 
-                                                style={{ width: `${Math.min(orgDetails[org.id]?.policy_alignment_score || 0, 100)}%` }}
-                                              />
-                                            </div>
-                                          </>
-                                        ) : (
-                                          <span className="text-gray-600">-</span>
-                                        )}
-                                      </div>
                                     </div>
                                     
                                     {/* Notes */}

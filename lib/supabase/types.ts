@@ -16,6 +16,7 @@ export interface Organization {
   total_spend?: number
   status?: string
   owner?: string
+  renewal_date?: string
   description?: string
   created_at: string
   updated_at: string
@@ -33,7 +34,6 @@ export interface ClientOrganizationHistory {
   annual_total_spend?: number
   relationship_owner?: string
   renewal_date?: string
-  last_contact_date?: string
   key_external_contacts?: string[]
   policy_alignment_score?: number
   notes?: string
