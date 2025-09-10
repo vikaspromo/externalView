@@ -12,7 +12,6 @@ export interface Organization {
   id: string
   name: string
   type?: string
-  priority?: number
   alignment_score?: number
   total_spend?: number
   status?: string
@@ -25,4 +24,19 @@ export interface Organization {
 export interface Client {
   uuid: string
   name: string
+}
+
+export interface ClientOrganizationHistory {
+  id: string
+  client_uuid: string
+  org_uuid: string
+  annual_total_spend?: number
+  relationship_owner?: string
+  renewal_date?: string
+  last_contact_date?: string
+  key_external_contacts?: string[]
+  policy_alignment_score?: number
+  notes?: string
+  created_at: string
+  updated_at: string
 }
