@@ -76,7 +76,7 @@ export const useOrganizations = (): OrganizationsState => {
       
       // Fetch organization positions
       const { data: positionsData } = await supabase
-        .from('organization_positions')
+        .from('org_positions')
         .select('positions')
         .eq('organization_uuid', orgId)
         .maybeSingle()

@@ -209,7 +209,7 @@ export default function DashboardPage() {
       
       // Fetch organization positions
       const { data: positionsData, error: positionsError } = await supabase
-        .from('organization_positions')
+        .from('org_positions')
         .select('positions')
         .eq('organization_uuid', orgId)
         .maybeSingle()

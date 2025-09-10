@@ -146,7 +146,7 @@ async function getAllOrganizationsWithoutPositions(): Promise<Organization[]> {
 
     // Get organizations that already have positions
     const { data: existingPositions, error: posError } = await supabase
-      .from('organization_positions')
+      .from('org_positions')
       .select('organization_uuid')
     
     if (posError) {
@@ -176,7 +176,7 @@ async function savePositionsToDatabase(
 ): Promise<boolean> {
   try {
     const { error } = await supabase
-      .from('organization_positions')
+      .from('org_positions')
       .insert({
         organization_uuid: org.uuid,
         organization_name: positions.organizationName,
@@ -200,16 +200,16 @@ async function savePositionsToDatabase(
 async function main() {
   console.log('🚀 Starting Organization Positions Fetch...\n')
   
-  // Check if the organization_positions table exists
+  // Check if the org_positions table exists
   const { error: tableCheckError } = await supabase
-    .from('organization_positions')
+    .from('org_positions')
     .select('id')
     .limit(1)
   
   if (tableCheckError && tableCheckError.message.includes('relation')) {
-    console.error('❌ Table "organization_positions" does not exist!')
+    console.error('❌ Table "org_positions" does not exist!')
     console.log('Please run the migration first:')
-    console.log('  SQL file: supabase/migrations/20250110_create_organization_positions.sql')
+    console.log('  SQL file: Run the migration to create org_positions table')
     process.exit(1)
   }
 
