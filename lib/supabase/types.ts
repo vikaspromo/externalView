@@ -1,3 +1,7 @@
+/**
+ * Core database table interfaces
+ */
+
 export interface User {
   id: string
   email: string
@@ -34,6 +38,17 @@ export interface ClientOrganizationHistory {
   key_external_contacts?: string[]
   policy_alignment_score?: number
   notes?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface OrganizationPosition {
+  id: string
+  organization_uuid: string
+  organization_name?: string
+  ein?: string
+  positions?: any[]
+  fetched_at?: string
   created_at: string
   updated_at: string
 }

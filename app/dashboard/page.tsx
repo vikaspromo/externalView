@@ -4,10 +4,8 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
+import { SortField, SortDirection } from '@/lib/types/dashboard'
 import { formatCurrency, formatDate, formatFieldValue } from '@/app/utils/formatters'
-
-type SortField = 'name' | 'alignment_score' | 'total_spend' | 'renewal_date'
-type SortDirection = 'asc' | 'desc'
 
 
 
