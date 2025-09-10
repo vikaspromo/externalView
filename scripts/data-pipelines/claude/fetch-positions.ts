@@ -1,5 +1,4 @@
 import Anthropic from '@anthropic-ai/sdk'
-import * as crypto from 'crypto'
 import { supabase } from '../shared/database'
 import { PROPUBLICA_CONFIG } from '../propublica/types'
 
@@ -128,23 +127,21 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
   }
 }
 
-async function getRandomOrganizationWithoutPositions(): Promise<Organization | null> {
+async function getAllOrganizationsWithoutPositions(): Promise<Organization[]> {
   try {
-    // Get all organizations with valid EINs
+    // Get all organizations
     const { data: organizations, error: orgsError } = await supabase
       .from('organizations')
       .select('uuid, name, ein')
-      .neq('ein', PROPUBLICA_CONFIG.NO_RESULTS_EIN)
-      .not('ein', 'is', null)
     
     if (orgsError) {
       console.error('Error fetching organizations:', orgsError)
-      return null
+      return []
     }
 
     if (!organizations || organizations.length === 0) {
-      console.log('No organizations with valid EINs found')
-      return null
+      console.log('No organizations found')
+      return []
     }
 
     // Get organizations that already have positions
@@ -154,7 +151,7 @@ async function getRandomOrganizationWithoutPositions(): Promise<Organization | n
     
     if (posError) {
       console.error('Error fetching existing positions:', posError)
-      return null
+      return []
     }
 
     // Filter out organizations that already have positions
@@ -163,15 +160,13 @@ async function getRandomOrganizationWithoutPositions(): Promise<Organization | n
 
     if (orgsWithoutPositions.length === 0) {
       console.log('All organizations already have positions data')
-      return null
+      return []
     }
 
-    // Select a random organization using cryptographically secure randomness
-    const randomIndex = crypto.randomInt(0, orgsWithoutPositions.length)
-    return orgsWithoutPositions[randomIndex]
+    return orgsWithoutPositions
   } catch (error) {
-    console.error('Error getting random organization:', error)
-    return null
+    console.error('Error getting organizations:', error)
+    return []
   }
 }
 
@@ -218,54 +213,80 @@ async function main() {
     process.exit(1)
   }
 
-  // Get a random organization without positions
-  const org = await getRandomOrganizationWithoutPositions()
+  // Get all organizations without positions
+  const organizations = await getAllOrganizationsWithoutPositions()
   
-  if (!org) {
+  if (organizations.length === 0) {
     console.log('No organizations available to fetch positions for')
     process.exit(0)
   }
 
-  console.log(`📊 Selected Organization: ${org.name}`)
-  console.log(`   EIN: ${org.ein}`)
+  console.log(`📊 Found ${organizations.length} organization(s) without positions\n`)
+  console.log('Processing all organizations...\n')
   
-  // Fetch positions from Claude
-  const positions = await fetchPositionsFromClaude(org.name, org.ein!)
+  let successCount = 0
+  let failureCount = 0
   
-  if (!positions) {
-    console.log('Failed to fetch positions from Claude API')
-    process.exit(1)
-  }
+  // Process each organization
+  for (let i = 0; i < organizations.length; i++) {
+    const org = organizations[i]
+    console.log('='.repeat(80))
+    console.log(`Processing ${i + 1} of ${organizations.length}: ${org.name}`)
+    console.log(`EIN: ${org.ein || 'No EIN'}`)
+    console.log('='.repeat(80))
+    
+    // Fetch positions from Claude
+    const positions = await fetchPositionsFromClaude(org.name, org.ein || 'Unknown')
+    
+    if (!positions) {
+      console.log('⚠️  Failed to fetch positions from Claude API')
+      failureCount++
+      
+      // Add delay before next request even on failure
+      if (i < organizations.length - 1) {
+        console.log('Waiting 2 seconds before next request...\n')
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+      continue
+    }
 
-  // Display the results
+    // Display the results
+    console.log('\n📋 Positions found:')
+    if (positions.positions.length > 0) {
+      positions.positions.forEach((pos, index) => {
+        console.log(`  ${index + 1}. ${pos.description} - ${pos.position}`)
+      })
+    } else {
+      console.log('  No positions found')
+    }
+
+    // Save to database
+    console.log('\n💾 Saving to database...')
+    const saved = await savePositionsToDatabase(org, positions)
+    
+    if (saved) {
+      console.log('✅ Successfully saved positions to database')
+      successCount++
+    } else {
+      console.log('⚠️  Failed to save to database')
+      failureCount++
+    }
+    
+    // Add delay between API calls (except for the last one)
+    if (i < organizations.length - 1) {
+      console.log('\nWaiting 2 seconds before next request...\n')
+      await new Promise(resolve => setTimeout(resolve, 2000))
+    }
+  }
+  
+  // Final summary
   console.log('\n' + '='.repeat(80))
-  console.log('📋 ORGANIZATION POSITIONS')
+  console.log('📈 FINAL SUMMARY')
   console.log('='.repeat(80))
-  console.log(JSON.stringify(positions, null, 2))
+  console.log(`  Total organizations processed: ${organizations.length}`)
+  console.log(`  ✅ Successfully saved: ${successCount}`)
+  console.log(`  ⚠️  Failed: ${failureCount}`)
   console.log('='.repeat(80))
-
-  // Ask if user wants to save to database
-  console.log('\n💾 Saving to database...')
-  const saved = await savePositionsToDatabase(org, positions)
-  
-  if (saved) {
-    console.log('✅ Successfully saved positions to database')
-  } else {
-    console.log('⚠️  Positions displayed but not saved to database')
-  }
-
-  // Summary
-  console.log('\n📈 Summary:')
-  console.log(`  - Organization: ${positions.organizationName}`)
-  console.log(`  - EIN: ${positions.ein}`)
-  console.log(`  - Positions found: ${positions.positions.length}`)
-  
-  if (positions.positions.length > 0) {
-    console.log('\n  Position topics:')
-    positions.positions.forEach((pos, index) => {
-      console.log(`    ${index + 1}. ${pos.description} - ${pos.position}`)
-    })
-  }
 }
 
 // Run the script
