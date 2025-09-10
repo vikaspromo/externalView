@@ -12,7 +12,6 @@ export interface Organization {
   id: string
   name: string
   type?: string
-  priority?: number
   alignment_score?: number
   total_spend?: number
   status?: string

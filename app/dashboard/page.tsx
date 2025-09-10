@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { User, Organization, Client } from '@/lib/supabase/types'
 
-type SortField = 'name' | 'priority' | 'alignment_score' | 'total_spend'
+type SortField = 'name' | 'alignment_score' | 'total_spend'
 type SortDirection = 'asc' | 'desc'
 
 // Helper function to format currency values
@@ -190,7 +190,7 @@ export default function DashboardPage() {
       // Get organizations for this client using relationship_summary view
       const { data: relationshipData, error: relationshipError } = await supabase
         .from('relationship_summary')
-        .select('client_uuid, org_uuid, org_name, org_type, total_spend, status, owner, renewal_date, alignment_score, priority')
+        .select('client_uuid, org_uuid, org_name, org_type, total_spend, status, owner, renewal_date, alignment_score')
         .eq('client_uuid', clientUuid)
       
       if (relationshipError) {
@@ -203,7 +203,6 @@ export default function DashboardPage() {
           id: rel.org_uuid || '',
           name: rel.org_name || '',
           type: rel.org_type || '',
-          priority: rel.priority || 0,
           alignment_score: rel.alignment_score || 0,
           total_spend: rel.total_spend || 0,
           status: rel.status || '',
@@ -238,8 +237,8 @@ export default function DashboardPage() {
       let bValue: any = b[sortField]
 
       // Handle null/undefined values
-      if (aValue == null) aValue = sortField === 'priority' ? 999 : 0
-      if (bValue == null) bValue = sortField === 'priority' ? 999 : 0
+      if (aValue == null) aValue = 0
+      if (bValue == null) bValue = 0
 
       // String comparison for name
       if (sortField === 'name') {
@@ -266,7 +265,7 @@ export default function DashboardPage() {
     } else {
       // Set new field with appropriate default direction
       setSortField(field)
-      setSortDirection(field === 'priority' ? 'asc' : 'desc')
+      setSortDirection('desc')
     }
   }
 
@@ -465,19 +464,6 @@ export default function DashboardPage() {
                       </th>
                       <th 
                         className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                        onClick={() => handleSort('priority')}
-                      >
-                        <div className="flex items-center">
-                          Priority
-                          {sortField === 'priority' && (
-                            <span className="ml-1">
-                              {sortDirection === 'asc' ? '↑' : '↓'}
-                            </span>
-                          )}
-                        </div>
-                      </th>
-                      <th 
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                         onClick={() => handleSort('alignment_score')}
                       >
                         <div className="flex items-center">
@@ -530,16 +516,6 @@ export default function DashboardPage() {
                                 </div>
                               </div>
                             </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              org.priority === 1 ? 'bg-red-100 text-red-800' :
-                              org.priority === 2 ? 'bg-yellow-100 text-yellow-800' :
-                              org.priority === 3 ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
-                            }`}>
-                              Priority {org.priority || '-'}
-                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
