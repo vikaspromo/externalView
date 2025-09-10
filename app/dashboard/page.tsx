@@ -19,6 +19,7 @@ export default function DashboardPage() {
   const [clients, setClients] = useState<Client[]>([])
   const [selectedClientUuid, setSelectedClientUuid] = useState<string>('')
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -52,6 +53,18 @@ export default function DashboardPage() {
         }
         
         setUserData(userData)
+        
+        // Check if user is an admin
+        const { data: adminData, error: adminError } = await supabase
+          .from('user_admins')
+          .select('email, active')
+          .eq('email', session.user.email)
+          .eq('active', true)
+          .single()
+        
+        if (!adminError && adminData) {
+          setIsAdmin(true)
+        }
         
         // Initialize organizations as empty - will be loaded after client selection
         setOrganizations([])
@@ -265,7 +278,7 @@ export default function DashboardPage() {
                   {selectedClient.name}
                 </h1>
               )}
-              {userData?.client_uuid === '36fee78e-9bac-4443-9339-6f53003d3250' && (
+              {isAdmin && (
                 <AdminClientToggle
                   clients={clients}
                   selectedClientUuid={selectedClientUuid}
