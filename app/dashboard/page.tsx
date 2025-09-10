@@ -102,10 +102,12 @@ export default function DashboardPage() {
           return
         }
         
-        // Use the RPC function to get clients (handles admin logic server-side)
-        console.log('Calling get_clients_for_user function')
+        // Get clients - RLS will handle admin vs user access
+        console.log('Fetching clients with RLS')
         const { data: clientsData, error: clientsError } = await supabase
-          .rpc('get_clients_for_user')
+          .from('clients')
+          .select('uuid, name')
+          .order('name', { ascending: true })
         
         if (clientsError) {
           console.error('Error fetching clients:', clientsError)
