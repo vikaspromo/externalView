@@ -333,10 +333,7 @@ export default function DashboardPage() {
         {/* Organizations Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Organizations</h2>
-            <p className="text-sm text-gray-600 mt-1">
-              Manage stakeholder relationships across your target organizations
-            </p>
+            <h2 className="text-lg font-semibold text-gray-900">External Organizations</h2>
           </div>
           
           <div className="p-6">
@@ -489,7 +486,15 @@ export default function DashboardPage() {
                                         Policy Positions ({orgDetails[org.id]?.positions?.length || 0})
                                       </h5>
                                       <div className="space-y-4">
-                                        {orgDetails[org.id]?.positions?.map((position: any, index: number) => (
+                                        {orgDetails[org.id]?.positions?.sort((a: any, b: any) => {
+                                          // Sort order: In favor -> Opposed -> No position
+                                          const order: { [key: string]: number } = {
+                                            'In favor': 1,
+                                            'Opposed': 2,
+                                            'No position': 3
+                                          };
+                                          return (order[a.position] || 999) - (order[b.position] || 999);
+                                        }).map((position: any, index: number) => (
                                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                                             {/* Position Header */}
                                             <div className="flex justify-between items-start mb-2">
