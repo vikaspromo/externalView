@@ -338,7 +338,7 @@ export default function DashboardPage() {
               )}
             </div>
             <div className="flex items-center space-x-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-500">
                 Welcome, {user.user_metadata?.full_name || user.email}
               </div>
               <button
@@ -353,24 +353,24 @@ export default function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
 
         {/* Portfolio Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Portfolio</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Portfolio</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Total Investment</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-medium text-gray-700 mb-2">Total Investment</p>
+                <p className="text-2xl font-semibold text-gray-900">
                   {formatCurrency(organizations.reduce((sum, org) => sum + (org.total_spend || 0), 0))}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Average Alignment Score</p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-sm font-medium text-gray-700 mb-2">Overall Alignment</p>
+                <p className="text-2xl font-semibold text-gray-900">
                   {(() => {
                     const orgsWithScores = organizations.filter(org => org.alignment_score != null)
                     if (orgsWithScores.length === 0) return '-'
@@ -380,9 +380,9 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Reallocation Opportunity</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Reallocation Opportunity</p>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-semibold text-gray-900">
                     {(() => {
                       const sixMonthsFromNow = new Date()
                       sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
@@ -409,7 +409,7 @@ export default function DashboardPage() {
         {/* Organizations Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">Organizations</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Organizations</h2>
           </div>
           
           <div className="p-6">
@@ -436,7 +436,7 @@ export default function DashboardPage() {
                         onClick={() => handleSort('alignment_score')}
                       >
                         <div className="flex items-center">
-                          Alignment Score
+                          Alignment
                           {sortField === 'alignment_score' && (
                             <span className="ml-1">
                               {sortDirection === 'asc' ? '↑' : '↓'}
@@ -492,14 +492,14 @@ export default function DashboardPage() {
                                   </svg>
                                 )}
                               </button>
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm text-gray-900">
                                 {org.name}
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-sm text-gray-900">
                                 {org.alignment_score ? `${org.alignment_score}%` : '-'}
                               </div>
                               {org.alignment_score && (
@@ -544,7 +544,7 @@ export default function DashboardPage() {
                                       
                                       {/* Right side - Key External Contacts */}
                                       <div>
-                                        <h5 className="text-sm font-semibold text-gray-700 mb-2">Key Organization Contacts</h5>
+                                        <h5 className="text-sm font-medium text-gray-700 mb-2">Key Organization Contacts</h5>
                                         {(orgDetails[org.id]?.key_external_contacts?.length ?? 0) > 0 ? (
                                           <ul className="space-y-1">
                                             {orgDetails[org.id]?.key_external_contacts?.map((contact, index) => (
@@ -563,10 +563,10 @@ export default function DashboardPage() {
                                     {/* Policy Positions Card */}
                                     {(orgDetails[org.id]?.positions?.length ?? 0) > 0 && (
                                     <div className="mt-6">
-                                      <h5 className="text-sm font-semibold text-gray-700 mb-4">
+                                      <h5 className="text-sm font-medium text-gray-700 mb-3">
                                         Policy Positions ({orgDetails[org.id]?.positions?.length || 0})
                                       </h5>
-                                      <div className="space-y-4">
+                                      <div className="space-y-3">
                                         {orgDetails[org.id]?.positions?.sort((a: any, b: any) => {
                                           // Sort order: In favor -> Opposed -> No position
                                           const order: { [key: string]: number } = {
@@ -579,7 +579,7 @@ export default function DashboardPage() {
                                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                                             {/* Position Header */}
                                             <div className="flex justify-between items-start mb-2">
-                                              <h6 className="font-medium text-gray-900">{position.description}</h6>
+                                              <h6 className="text-sm font-medium text-gray-900">{position.description}</h6>
                                               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                 position.position === 'In favor' 
                                                   ? 'bg-green-100 text-green-800'
@@ -649,7 +649,7 @@ export default function DashboardPage() {
                   </svg>
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No Organizations Yet</h3>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-500 mb-4">
                   Start building your stakeholder intelligence by adding organizations to track.
                 </p>
                 <button className="bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-primary-700 transition-colors">
