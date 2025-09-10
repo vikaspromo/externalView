@@ -105,44 +105,63 @@ async function processOrganization(org: Organization): Promise<void> {
     return
   }
   
-  // Handle multiple matches
+  // Handle multiple matches - group by normalized name
   console.log(`  📝 Multiple matches with same score:`)
-  const allEins = topMatches.map(m => m.strein)
   
-  // Update the existing record with the first match
-  const firstMatch = topMatches[0]
-  console.log(`    Updating existing: ${firstMatch.name} (EIN: ${firstMatch.strein})`)
+  // Group matches by normalized (lowercase) name
+  const groupedByName = new Map<string, typeof topMatches>()
   
-  const { error: updateError } = await supabase
-    .from('organizations')
-    .update({ 
-      name: firstMatch.name,
-      ein: firstMatch.strein,
-      ein_related: allEins.filter(e => e !== firstMatch.strein)
-    })
-    .eq('uuid', org.uuid)
-  
-  if (updateError) {
-    console.error(`  Error updating organization:`, updateError)
-    return
+  for (const match of topMatches) {
+    const normalizedName = match.name.toLowerCase()
+    if (!groupedByName.has(normalizedName)) {
+      groupedByName.set(normalizedName, [])
+    }
+    groupedByName.get(normalizedName)!.push(match)
   }
   
-  // Insert new records for the remaining matches
-  for (let i = 1; i < topMatches.length; i++) {
-    const match = topMatches[i]
-    console.log(`    Inserting new: ${match.name} (EIN: ${match.strein})`)
+  console.log(`    Found ${groupedByName.size} unique organization name(s)`)
+  
+  // Process each unique name group
+  const nameGroups = Array.from(groupedByName.entries())
+  
+  for (let i = 0; i < nameGroups.length; i++) {
+    const [, matches] = nameGroups[i]
     
-    // Insert new organization with minimal fields
-    const { error: insertError } = await supabase
-      .from('organizations')
-      .insert({
-        name: match.name,
-        ein: match.strein,
-        ein_related: allEins.filter(e => e !== match.strein)
-      })
+    // Use the first match's exact name (with original capitalization)
+    const primaryMatch = matches[0]
+    const groupEins = matches.map(m => m.strein)
     
-    if (insertError) {
-      console.error(`  Error inserting new organization:`, insertError)
+    if (i === 0) {
+      // Update the existing record with the first name group
+      console.log(`    Updating existing: ${primaryMatch.name} (${matches.length} EIN(s): ${groupEins.join(', ')})`)
+      
+      const { error: updateError } = await supabase
+        .from('organizations')
+        .update({ 
+          name: primaryMatch.name,
+          ein: primaryMatch.strein,
+          ein_related: groupEins.filter(e => e !== primaryMatch.strein)
+        })
+        .eq('uuid', org.uuid)
+      
+      if (updateError) {
+        console.error(`  Error updating organization:`, updateError)
+      }
+    } else {
+      // Insert new record for different name groups
+      console.log(`    Inserting new: ${primaryMatch.name} (${matches.length} EIN(s): ${groupEins.join(', ')})`)
+      
+      const { error: insertError } = await supabase
+        .from('organizations')
+        .insert({
+          name: primaryMatch.name,
+          ein: primaryMatch.strein,
+          ein_related: groupEins.filter(e => e !== primaryMatch.strein)
+        })
+      
+      if (insertError) {
+        console.error(`  Error inserting new organization:`, insertError)
+      }
     }
   }
 }
