@@ -76,7 +76,8 @@ export default function DashboardPage() {
           const minimalUserData = {
             id: session.user.id,
             email: session.user.email,
-            company: 'Admin',
+            first_name: null,
+            last_name: null,
             client_uuid: '', // No default client for admins
             active: true,
             created_at: new Date().toISOString(),

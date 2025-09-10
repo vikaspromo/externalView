@@ -5,7 +5,8 @@
 export interface User {
   id: string
   email: string
-  company: string
+  first_name: string | null
+  last_name: string | null
   client_uuid: string
   active: boolean
   created_at: string
