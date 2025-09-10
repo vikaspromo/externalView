@@ -12,7 +12,7 @@
     "@anthropic-ai/sdk": "^0.61.0",
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/supabase-js": "^2.57.2",
-    "next": "14.2.15",
+    "next": "14.2.32",
     "react": "^18",
     "react-dom": "^18"
   },
