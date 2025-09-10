@@ -355,10 +355,61 @@ export default function DashboardPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        {/* Portfolio Card */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900">Portfolio</h2>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Investment</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatCurrency(organizations.reduce((sum, org) => sum + (org.total_spend || 0), 0))}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Average Alignment Score</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {(() => {
+                    const orgsWithScores = organizations.filter(org => org.alignment_score != null)
+                    if (orgsWithScores.length === 0) return '-'
+                    const avgScore = orgsWithScores.reduce((sum, org) => sum + (org.alignment_score || 0), 0) / orgsWithScores.length
+                    return Math.round(avgScore) + '%'
+                  })()}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Reallocation Opportunity</p>
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {(() => {
+                      const sixMonthsFromNow = new Date()
+                      sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6)
+                      
+                      const atRiskTotal = organizations.reduce((sum, org) => {
+                        if (!org.renewal_date) return sum
+                        const renewalDate = new Date(org.renewal_date)
+                        if (renewalDate <= sixMonthsFromNow) {
+                          return sum + (org.total_spend || 0)
+                        }
+                        return sum
+                      }, 0)
+                      
+                      return formatCurrency(atRiskTotal)
+                    })()}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Next 6 months</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Organizations Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">External Organizations</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Organizations</h2>
           </div>
           
           <div className="p-6">
@@ -398,7 +449,7 @@ export default function DashboardPage() {
                         onClick={() => handleSort('total_spend')}
                       >
                         <div className="flex items-center">
-                          Budget
+                          Investment
                           {sortField === 'total_spend' && (
                             <span className="ml-1">
                               {sortDirection === 'asc' ? '↑' : '↓'}
