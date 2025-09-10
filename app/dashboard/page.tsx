@@ -90,6 +90,20 @@ export default function DashboardPage() {
         setOrganizations([])
 
         // Get all clients from clients table
+        console.log('Fetching clients for user:', session.user.email, 'isAdmin:', isAdminUser)
+        console.log('Session user ID:', session.user.id)
+        console.log('Session access token exists:', !!session.access_token)
+        
+        // Ensure we have a fresh session before querying
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        if (!currentSession) {
+          console.error('No active session when fetching clients')
+          router.push('/')
+          return
+        }
+        
+        // Get clients - RLS will handle admin vs user access
+        console.log('Fetching clients with RLS')
         const { data: clientsData, error: clientsError } = await supabase
           .from('clients')
           .select('uuid, name')
@@ -97,8 +111,10 @@ export default function DashboardPage() {
         
         if (clientsError) {
           console.error('Error fetching clients:', clientsError)
+          console.error('Full error details:', JSON.stringify(clientsError, null, 2))
         } else {
           console.log('Clients data:', clientsData)
+          console.log('Number of clients fetched:', clientsData?.length || 0)
           setClients(clientsData || [])
           
           // Set the user's client UUID as the default selected client UUID
