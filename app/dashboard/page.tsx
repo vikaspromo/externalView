@@ -1,9 +1,8 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState, useMemo, useCallback } from 'react'
 import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 
 type SortField = 'name' | 'alignment_score' | 'total_spend' | 'renewal_date'
@@ -116,7 +115,7 @@ export default function DashboardPage() {
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-  const [orgDetails, setOrgDetails] = useState<Record<string, ClientOrganizationHistory | null>>({})
+  const [orgDetails, setOrgDetails] = useState<Record<string, (ClientOrganizationHistory & { positions?: any[] }) | null>>({})
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -211,7 +210,7 @@ export default function DashboardPage() {
         // Keep the full relationship data for table display
         const transformedOrgs = relationshipData?.map(rel => ({
           id: rel.org_uuid || '',
-          name: rel.organizations?.name || '',
+          name: (rel.organizations as any)?.name || '',
           type: '', // organizations table doesn't have a type column
           alignment_score: rel.policy_alignment_score || 0,
           total_spend: rel.annual_total_spend || 0,
@@ -297,23 +296,35 @@ export default function DashboardPage() {
   const fetchOrgDetails = async (orgId: string) => {
     try {
       // Fetch from client_organization_history
-      const { data, error } = await supabase
+      const { data: historyData, error: historyError } = await supabase
         .from('client_organization_history')
         .select('*')
         .eq('client_uuid', selectedClientUuid)
         .eq('org_uuid', orgId)
         .maybeSingle()
       
-      if (error) {
-        console.error('Error fetching organization details:', error)
+      // Fetch organization positions
+      const { data: positionsData, error: positionsError } = await supabase
+        .from('organization_positions')
+        .select('positions')
+        .eq('organization_uuid', orgId)
+        .maybeSingle()
+      
+      if (historyError) {
+        console.error('Error fetching organization details:', historyError)
         setOrgDetails(prev => ({
           ...prev,
           [orgId]: null
         }))
       } else {
+        // Combine history data with positions
+        const combinedData = {
+          ...(historyData as ClientOrganizationHistory),
+          positions: positionsData?.positions || []
+        }
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: data as ClientOrganizationHistory
+          [orgId]: combinedData
         }))
       }
     } catch (error) {
@@ -323,7 +334,7 @@ export default function DashboardPage() {
         [orgId]: null
       }))
     }
-  }
+  }  // End of fetchOrgDetails function
 
   if (isLoading) {
     return (
@@ -533,32 +544,92 @@ export default function DashboardPage() {
                             <td colSpan={6} className="px-6 py-6 bg-gray-50">
                               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                                 {orgDetails[org.id] ? (
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {/* Left side - Notes */}
-                                    <div>
-                                      <h5 className="text-sm font-semibold text-gray-700 mb-2">Notes</h5>
-                                      <p className="text-sm text-gray-600">
-                                        {orgDetails[org.id]?.notes || 'No notes available'}
-                                      </p>
+                                  <>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                      {/* Left side - Notes */}
+                                      <div>
+                                        <h5 className="text-sm font-semibold text-gray-700 mb-2">Notes</h5>
+                                        <p className="text-sm text-gray-600">
+                                          {orgDetails[org.id]?.notes || 'No notes available'}
+                                        </p>
+                                      </div>
+                                      
+                                      {/* Right side - Key External Contacts */}
+                                      <div>
+                                        <h5 className="text-sm font-semibold text-gray-700 mb-2">Key Organization Contacts</h5>
+                                        {(orgDetails[org.id]?.key_external_contacts?.length ?? 0) > 0 ? (
+                                          <ul className="space-y-1">
+                                            {orgDetails[org.id]?.key_external_contacts?.map((contact, index) => (
+                                              <li key={index} className="text-sm text-gray-600 flex items-start">
+                                                <span className="text-gray-400 mr-2">•</span>
+                                                <span>{contact}</span>
+                                              </li>
+                                            ))}
+                                          </ul>
+                                        ) : (
+                                          <p className="text-sm text-gray-500">No contacts listed</p>
+                                        )}
+                                      </div>
                                     </div>
                                     
-                                    {/* Right side - Key External Contacts */}
-                                    <div>
-                                      <h5 className="text-sm font-semibold text-gray-700 mb-2">Key Organization Contacts</h5>
-                                      {orgDetails[org.id]?.key_external_contacts && orgDetails[org.id]!.key_external_contacts!.length > 0 ? (
-                                        <ul className="space-y-1">
-                                          {orgDetails[org.id]!.key_external_contacts!.map((contact, index) => (
-                                            <li key={index} className="text-sm text-gray-600 flex items-start">
-                                              <span className="text-gray-400 mr-2">•</span>
-                                              <span>{contact}</span>
-                                            </li>
-                                          ))}
-                                        </ul>
-                                      ) : (
-                                        <p className="text-sm text-gray-500">No contacts listed</p>
-                                      )}
+                                    {/* Policy Positions Card */}
+                                    {(orgDetails[org.id]?.positions?.length ?? 0) > 0 && (
+                                    <div className="mt-6 border-t pt-6">
+                                      <h5 className="text-sm font-semibold text-gray-700 mb-4">
+                                        Policy Positions ({orgDetails[org.id]?.positions?.length || 0})
+                                      </h5>
+                                      <div className="space-y-4">
+                                        {orgDetails[org.id]?.positions?.map((position: any, index: number) => (
+                                          <div key={index} className="border border-gray-200 rounded-lg p-4">
+                                            {/* Position Header */}
+                                            <div className="flex justify-between items-start mb-2">
+                                              <h6 className="font-medium text-gray-900">{position.description}</h6>
+                                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                position.position === 'In favor' 
+                                                  ? 'bg-green-100 text-green-800'
+                                                  : position.position === 'Opposed'
+                                                  ? 'bg-red-100 text-red-800'
+                                                  : 'bg-gray-100 text-gray-800'
+                                              }`}>
+                                                {position.position}
+                                              </span>
+                                            </div>
+                                            
+                                            {/* Position Details */}
+                                            <p className="text-sm text-gray-600 mb-3">
+                                              {position.positionDetails}
+                                            </p>
+                                            
+                                            {/* Reference Materials */}
+                                            {position.referenceMaterials && position.referenceMaterials.length > 0 && (
+                                              <div>
+                                                <p className="text-xs font-medium text-gray-500 mb-1">References:</p>
+                                                <ul className="space-y-1">
+                                                  {position.referenceMaterials.map((ref: string, refIndex: number) => (
+                                                    <li key={refIndex} className="text-xs">
+                                                      {ref.startsWith('http') ? (
+                                                        <a 
+                                                          href={ref} 
+                                                          target="_blank" 
+                                                          rel="noopener noreferrer"
+                                                          className="text-blue-600 hover:text-blue-800 underline"
+                                                        >
+                                                          {ref}
+                                                        </a>
+                                                      ) : (
+                                                        <span className="text-gray-500">• {ref}</span>
+                                                      )}
+                                                    </li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
                                     </div>
-                                  </div>
+                                  )}
+                                  </>
                                 ) : (
                                   <div className="text-center py-4">
                                     <p className="text-sm text-gray-500">No relationship data available for this organization</p>
