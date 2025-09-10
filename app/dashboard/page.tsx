@@ -574,7 +574,7 @@ export default function DashboardPage() {
                                     
                                     {/* Policy Positions Card */}
                                     {(orgDetails[org.id]?.positions?.length ?? 0) > 0 && (
-                                    <div className="mt-6 border-t pt-6">
+                                    <div className="mt-6">
                                       <h5 className="text-sm font-semibold text-gray-700 mb-4">
                                         Policy Positions ({orgDetails[org.id]?.positions?.length || 0})
                                       </h5>
