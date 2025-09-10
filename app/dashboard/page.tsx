@@ -59,7 +59,7 @@ export default function DashboardPage() {
           .from('users')
           .select('*')
           .eq('id', session.user.id)
-          .single()
+          .maybeSingle()
         
         if (!userData && !isAdminUser) {
           // Not in users table and not an admin - deny access
