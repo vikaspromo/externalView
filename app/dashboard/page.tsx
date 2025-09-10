@@ -4,7 +4,7 @@ import React from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState, useMemo, useCallback } from 'react'
-import { User, Organization, Client } from '@/lib/supabase/types'
+import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 
 type SortField = 'name' | 'alignment_score' | 'total_spend'
 type SortDirection = 'asc' | 'desc'
@@ -116,7 +116,7 @@ export default function DashboardPage() {
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
-  const [orgDetails, setOrgDetails] = useState<Record<string, any>>({})
+  const [orgDetails, setOrgDetails] = useState<Record<string, ClientOrganizationHistory | null>>({})
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -285,72 +285,31 @@ export default function DashboardPage() {
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
-      // Fetch from client_org_relationships
+      // Fetch from client_organization_history
       const { data, error } = await supabase
-        .from('client_org_relationships')
+        .from('client_organization_history')
         .select('*')
         .eq('client_uuid', selectedClientUuid)
         .eq('org_uuid', orgId)
         .maybeSingle()
       
       if (error) {
-        // Handle specific RLS errors
-        if (error.code === '42501' || error.message?.includes('policy')) {
-          console.error('RLS Policy Error: User does not have permission to access this data')
-          console.error('Details:', error)
-          
-          // Set a user-friendly error in the details
-          setOrgDetails(prev => ({
-            ...prev,
-            [orgId]: { 
-              error: 'Permission denied. Please contact your administrator.',
-              errorDetails: error.message 
-            }
-          }))
-        } else if (error.code === 'PGRST116') {
-          console.warn('No matching records found for this organization')
-          setOrgDetails(prev => ({
-            ...prev,
-            [orgId]: { 
-              error: 'No data available for this organization',
-              isEmpty: true 
-            }
-          }))
-        } else {
-          console.error('Database error:', error)
-          setOrgDetails(prev => ({
-            ...prev,
-            [orgId]: { 
-              error: 'Failed to load organization details',
-              errorDetails: error.message 
-            }
-          }))
-        }
-      } else if (data) {
-        console.log('Successfully fetched organization details')
+        console.error('Error fetching organization details:', error)
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: data
+          [orgId]: null
         }))
       } else {
-        // No data and no error means the record doesn't exist
-        console.log('No data exists for this organization')
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: { 
-            isEmpty: true,
-            message: 'No details available yet for this organization' 
-          }
+          [orgId]: data as ClientOrganizationHistory
         }))
       }
     } catch (error) {
       console.error('Unexpected error in fetchOrgDetails:', error)
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: { 
-          error: 'An unexpected error occurred',
-          errorDetails: String(error) 
-        }
+        [orgId]: null
       }))
     }
   }
@@ -539,190 +498,110 @@ export default function DashboardPage() {
                         {expandedRows.has(org.id) && (
                           <tr>
                             <td colSpan={4} className="px-6 py-6 bg-gray-50">
-                              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* Financial Admin Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Financial Administration</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].financial_admin && Object.keys(orgDetails[org.id].financial_admin).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].financial_admin).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
+                              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                                <h4 className="text-base font-semibold text-gray-900 mb-4">Relationship Details</h4>
+                                {orgDetails[org.id] ? (
+                                  <div className="space-y-3">
+                                    {/* Annual Total Spend */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Annual Total Spend:</span>
+                                      <span className="text-gray-600">
+                                        {orgDetails[org.id]?.annual_total_spend 
+                                          ? formatCurrency(orgDetails[org.id]!.annual_total_spend!) 
+                                          : '-'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Relationship Owner */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Relationship Owner:</span>
+                                      <span className="text-gray-600">
+                                        {orgDetails[org.id]?.relationship_owner || '-'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Renewal Date */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Renewal Date:</span>
+                                      <span className="text-gray-600">
+                                        {orgDetails[org.id]?.renewal_date 
+                                          ? formatDate(orgDetails[org.id]!.renewal_date!) 
+                                          : '-'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Relationship Status */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Status:</span>
+                                      <span className="flex items-center">
+                                        {orgDetails[org.id]?.relationship_status && (
+                                          <>
+                                            <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
+                                              orgDetails[org.id]!.relationship_status === 'Green' ? 'bg-green-500' :
+                                              orgDetails[org.id]!.relationship_status === 'Yellow' ? 'bg-yellow-500' :
+                                              orgDetails[org.id]!.relationship_status === 'Red' ? 'bg-red-500' : ''
+                                            }`}></span>
+                                            <span className="text-gray-600">{orgDetails[org.id]!.relationship_status}</span>
+                                          </>
+                                        )}
+                                        {!orgDetails[org.id]?.relationship_status && <span className="text-gray-600">-</span>}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Last Contact Date */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Last Contact:</span>
+                                      <span className="text-gray-600">
+                                        {orgDetails[org.id]?.last_contact_date 
+                                          ? formatDate(orgDetails[org.id]!.last_contact_date!) 
+                                          : '-'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Key External Contacts */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Key Contacts:</span>
+                                      <span className="text-gray-600">
+                                        {orgDetails[org.id]?.key_external_contacts && orgDetails[org.id]!.key_external_contacts!.length > 0
+                                          ? orgDetails[org.id]!.key_external_contacts!.join(', ')
+                                          : '-'}
+                                      </span>
+                                    </div>
+                                    
+                                    {/* Policy Alignment Score */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Alignment Score:</span>
+                                      <div className="flex items-center">
+                                        {orgDetails[org.id]?.policy_alignment_score !== null && orgDetails[org.id]?.policy_alignment_score !== undefined ? (
+                                          <>
+                                            <span className="text-gray-600 mr-3">{orgDetails[org.id]!.policy_alignment_score}%</span>
+                                            <div className="w-32 bg-gray-200 rounded-full h-2">
+                                              <div 
+                                                className="bg-primary-600 h-2 rounded-full" 
+                                                style={{ width: `${Math.min(orgDetails[org.id]?.policy_alignment_score || 0, 100)}%` }}
+                                              />
+                                            </div>
+                                          </>
+                                        ) : (
+                                          <span className="text-gray-600">-</span>
+                                        )}
                                       </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No financial data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading financial data...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Relationship Management Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Relationship Management</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].relationship_mgmt && Object.keys(orgDetails[org.id].relationship_mgmt).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].relationship_mgmt).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No relationship management data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading relationship data...</p>
-                                  )}
-                                </div>
-                                
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Deliverables</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].deliverables && Object.keys(orgDetails[org.id].deliverables).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].deliverables).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No deliverables data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading deliverables...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Strategic Alignment Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Strategic Alignment</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].strategic_alignment && Object.keys(orgDetails[org.id].strategic_alignment).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].strategic_alignment).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No strategic alignment data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading strategic alignment...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Events Engagement Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Events Engagement</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].events_engagement && Object.keys(orgDetails[org.id].events_engagement).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].events_engagement).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No events engagement data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading events data...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Classification Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Classification</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].classification && Object.keys(orgDetails[org.id].classification).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].classification).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No classification data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading classification...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Intelligence Monitoring Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Intelligence Monitoring</h4>
-                                  {orgDetails[org.id] ? (
-                                    (orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring) && 
-                                    Object.keys(orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring || {}).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].intelligence_monitoring || orgDetails[org.id].intelligence_monioring).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No intelligence monitoring data available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading intelligence data...</p>
-                                  )}
-                                </div>
-                                
-                                {/* Historical Context Card */}
-                                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                  <h4 className="text-base font-semibold text-gray-900 mb-4">Historical Context</h4>
-                                  {orgDetails[org.id] ? (
-                                    orgDetails[org.id].historical_context && Object.keys(orgDetails[org.id].historical_context).length > 0 ? (
-                                      <div className="space-y-2">
-                                        {Object.entries(orgDetails[org.id].historical_context).map(([key, value]) => (
-                                          <div key={key} className="text-sm">
-                                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:</span>
-                                            <span className="ml-2 text-gray-600">
-                                              {formatFieldValue(key, value)}
-                                            </span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    ) : (
-                                      <p className="text-sm text-gray-500">No historical context available</p>
-                                    )
-                                  ) : (
-                                    <p className="text-sm text-gray-500">Loading historical data...</p>
-                                  )}
-                                </div>
+                                    </div>
+                                    
+                                    {/* Notes */}
+                                    <div className="flex items-start">
+                                      <span className="font-medium text-gray-700 w-40">Notes:</span>
+                                      <span className="text-gray-600 flex-1">
+                                        {orgDetails[org.id]?.notes || '-'}
+                                      </span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="text-center py-4">
+                                    <p className="text-sm text-gray-500">No relationship data available for this organization</p>
+                                    <p className="text-xs text-gray-400 mt-2">Add relationship details to start tracking this organization</p>
+                                  </div>
+                                )}
                               </div>
                             </td>
                           </tr>
