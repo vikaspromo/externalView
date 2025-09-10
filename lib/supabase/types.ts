@@ -33,7 +33,6 @@ export interface ClientOrganizationHistory {
   annual_total_spend?: number
   relationship_owner?: string
   renewal_date?: string
-  relationship_status?: 'Red' | 'Yellow' | 'Green'
   last_contact_date?: string
   key_external_contacts?: string[]
   policy_alignment_score?: number

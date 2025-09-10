@@ -530,24 +530,6 @@ export default function DashboardPage() {
                                       </span>
                                     </div>
                                     
-                                    {/* Relationship Status */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Status:</span>
-                                      <span className="flex items-center">
-                                        {orgDetails[org.id]?.relationship_status && (
-                                          <>
-                                            <span className={`inline-block w-3 h-3 rounded-full mr-2 ${
-                                              orgDetails[org.id]!.relationship_status === 'Green' ? 'bg-green-500' :
-                                              orgDetails[org.id]!.relationship_status === 'Yellow' ? 'bg-yellow-500' :
-                                              orgDetails[org.id]!.relationship_status === 'Red' ? 'bg-red-500' : ''
-                                            }`}></span>
-                                            <span className="text-gray-600">{orgDetails[org.id]!.relationship_status}</span>
-                                          </>
-                                        )}
-                                        {!orgDetails[org.id]?.relationship_status && <span className="text-gray-600">-</span>}
-                                      </span>
-                                    </div>
-                                    
                                     {/* Last Contact Date */}
                                     <div className="flex items-start">
                                       <span className="font-medium text-gray-700 w-40">Last Contact:</span>
