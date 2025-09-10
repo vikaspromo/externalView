@@ -26,9 +26,9 @@ export const useOrganizations = (): OrganizationsState => {
 
   const loadOrganizations = useCallback(async (clientUuid: string) => {
     try {
-      // Get organizations for this client by joining client_organization_history with organizations
+      // Get organizations for this client by joining client_org_history with organizations
       const { data: relationshipData, error: relationshipError } = await supabase
-        .from('client_organization_history')
+        .from('client_org_history')
         .select(`
           client_uuid,
           org_uuid,
@@ -66,9 +66,9 @@ export const useOrganizations = (): OrganizationsState => {
 
   const fetchOrgDetails = useCallback(async (orgId: string, clientUuid: string) => {
     try {
-      // Fetch from client_organization_history
+      // Fetch from client_org_history
       const { data: historyData, error: historyError } = await supabase
-        .from('client_organization_history')
+        .from('client_org_history')
         .select('*')
         .eq('client_uuid', clientUuid)
         .eq('org_uuid', orgId)

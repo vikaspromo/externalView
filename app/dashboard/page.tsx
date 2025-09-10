@@ -93,9 +93,9 @@ export default function DashboardPage() {
 
   const loadOrganizations = useCallback(async (clientUuid: string) => {
     try {
-      // Get organizations for this client by joining client_organization_history with organizations
+      // Get organizations for this client by joining client_org_history with organizations
       const { data: relationshipData, error: relationshipError } = await supabase
-        .from('client_organization_history')
+        .from('client_org_history')
         .select(`
           client_uuid,
           org_uuid,
@@ -199,9 +199,9 @@ export default function DashboardPage() {
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
-      // Fetch from client_organization_history
+      // Fetch from client_org_history
       const { data: historyData, error: historyError } = await supabase
-        .from('client_organization_history')
+        .from('client_org_history')
         .select('*')
         .eq('client_uuid', selectedClientUuid)
         .eq('org_uuid', orgId)
