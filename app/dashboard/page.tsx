@@ -471,6 +471,9 @@ export default function DashboardPage() {
                           )}
                         </div>
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Relationship Owner
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -521,38 +524,39 @@ export default function DashboardPage() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {org.renewal_date ? formatDate(org.renewal_date) : '-'}
                           </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {org.owner || '-'}
+                          </td>
                         </tr>
                         {expandedRows.has(org.id) && (
                           <tr>
-                            <td colSpan={5} className="px-6 py-6 bg-gray-50">
+                            <td colSpan={6} className="px-6 py-6 bg-gray-50">
                               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                                <h4 className="text-base font-semibold text-gray-900 mb-4">Relationship Details</h4>
                                 {orgDetails[org.id] ? (
-                                  <div className="space-y-3">
-                                    {/* Relationship Owner */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Relationship Owner:</span>
-                                      <span className="text-gray-600">
-                                        {orgDetails[org.id]?.relationship_owner || '-'}
-                                      </span>
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Left side - Notes */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold text-gray-700 mb-2">Notes</h5>
+                                      <p className="text-sm text-gray-600">
+                                        {orgDetails[org.id]?.notes || 'No notes available'}
+                                      </p>
                                     </div>
                                     
-                                    {/* Key External Contacts */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Key Contacts:</span>
-                                      <span className="text-gray-600">
-                                        {orgDetails[org.id]?.key_external_contacts && orgDetails[org.id]!.key_external_contacts!.length > 0
-                                          ? orgDetails[org.id]!.key_external_contacts!.join(', ')
-                                          : '-'}
-                                      </span>
-                                    </div>
-                                    
-                                    {/* Notes */}
-                                    <div className="flex items-start">
-                                      <span className="font-medium text-gray-700 w-40">Notes:</span>
-                                      <span className="text-gray-600 flex-1">
-                                        {orgDetails[org.id]?.notes || '-'}
-                                      </span>
+                                    {/* Right side - Key External Contacts */}
+                                    <div>
+                                      <h5 className="text-sm font-semibold text-gray-700 mb-2">Key Organization Contacts</h5>
+                                      {orgDetails[org.id]?.key_external_contacts && orgDetails[org.id]!.key_external_contacts!.length > 0 ? (
+                                        <ul className="space-y-1">
+                                          {orgDetails[org.id]!.key_external_contacts!.map((contact, index) => (
+                                            <li key={index} className="text-sm text-gray-600 flex items-start">
+                                              <span className="text-gray-400 mr-2">•</span>
+                                              <span>{contact}</span>
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      ) : (
+                                        <p className="text-sm text-gray-500">No contacts listed</p>
+                                      )}
                                     </div>
                                   </div>
                                 ) : (
