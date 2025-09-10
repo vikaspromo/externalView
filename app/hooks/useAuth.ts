@@ -61,7 +61,8 @@ export const useAuth = (): AuthState => {
           const minimalUserData: User = {
             id: session.user.id,
             email: session.user.email!,  // Email is guaranteed to exist after OAuth
-            company: 'Admin',
+            first_name: null,
+            last_name: null,
             client_uuid: '', // Admins don't have a default client
             active: true,
             created_at: new Date().toISOString(),
