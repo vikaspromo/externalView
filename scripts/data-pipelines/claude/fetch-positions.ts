@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
+import * as crypto from 'crypto'
 import { supabase } from '../shared/database'
 import { PROPUBLICA_CONFIG } from '../propublica/types'
 
@@ -165,8 +166,8 @@ async function getRandomOrganizationWithoutPositions(): Promise<Organization | n
       return null
     }
 
-    // Select a random organization
-    const randomIndex = Math.floor(Math.random() * orgsWithoutPositions.length)
+    // Select a random organization using cryptographically secure randomness
+    const randomIndex = crypto.randomInt(0, orgsWithoutPositions.length)
     return orgsWithoutPositions[randomIndex]
   } catch (error) {
     console.error('Error getting random organization:', error)
