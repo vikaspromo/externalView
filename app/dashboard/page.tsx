@@ -187,27 +187,37 @@ export default function DashboardPage() {
 
   const loadOrganizations = useCallback(async (clientUuid: string) => {
     try {
-      // Get organizations for this client using relationship_summary view
+      // Get organizations for this client by joining client_organization_history with organizations
       const { data: relationshipData, error: relationshipError } = await supabase
-        .from('relationship_summary')
-        .select('client_uuid, org_uuid, org_name, org_type, total_spend, status, owner, renewal_date, alignment_score')
+        .from('client_organization_history')
+        .select(`
+          client_uuid,
+          org_uuid,
+          annual_total_spend,
+          relationship_owner,
+          renewal_date,
+          policy_alignment_score,
+          organizations!org_uuid (
+            name
+          )
+        `)
         .eq('client_uuid', clientUuid)
       
       if (relationshipError) {
-        console.error('Error fetching from relationship_summary:', relationshipError)
+        console.error('Error fetching client organization relationships:', relationshipError)
         // No fallback - organizations are only shown through client relationships
         setOrganizations([])
       } else {
         // Keep the full relationship data for table display
         const transformedOrgs = relationshipData?.map(rel => ({
           id: rel.org_uuid || '',
-          name: rel.org_name || '',
-          type: rel.org_type || '',
-          alignment_score: rel.alignment_score || 0,
-          total_spend: rel.total_spend || 0,
-          status: rel.status || '',
-          owner: rel.owner || '',
-          description: `${rel.org_type || ''} | Status: ${rel.status || ''} | Owner: ${rel.owner || ''}`,
+          name: rel.organizations?.name || '',
+          type: '', // organizations table doesn't have a type column
+          alignment_score: rel.policy_alignment_score || 0,
+          total_spend: rel.annual_total_spend || 0,
+          status: '', // status column was removed in migration
+          owner: rel.relationship_owner || '',
+          description: `Owner: ${rel.relationship_owner || 'Unassigned'}`,
           created_at: '',
           updated_at: ''
         })) || []
