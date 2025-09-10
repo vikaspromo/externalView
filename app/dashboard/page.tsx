@@ -258,10 +258,37 @@ export default function DashboardPage() {
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-light tracking-wide text-red-600">
-                External View
-              </h1>
+            <div className="flex items-center space-x-4">
+              {selectedClient && (
+                <h1 className="text-2xl font-bold tracking-wide text-gray-900">
+                  {selectedClient.name}
+                </h1>
+              )}
+              {userData?.client_uuid === '36fee78e-9bac-4443-9339-6f53003d3250' && (
+                <select
+                  id="client-select"
+                  value={selectedClientUuid}
+                  onChange={(e) => {
+                    const newClientUuid = e.target.value
+                    setSelectedClientUuid(newClientUuid)
+                    
+                    // Also update selectedClient object for display purposes
+                    const client = clients.find(c => c.uuid === newClientUuid)
+                    setSelectedClient(client || null)
+                    
+                    // Dashboard will automatically refresh via useEffect on selectedClientUuid change
+                    // This will reload organizations and any other client-specific data
+                  }}
+                  className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white"
+                >
+                  <option value="">Select a client...</option>
+                  {clients.map((client) => (
+                    <option key={client.uuid} value={client.uuid}>
+                      {client.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-600">
@@ -280,44 +307,6 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {/* Client Selection Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            {selectedClient && (
-              <h1 className="text-2xl font-bold tracking-wide text-gray-900">
-                {selectedClient.name}
-              </h1>
-            )}
-          </div>
-          {userData?.client_uuid === '36fee78e-9bac-4443-9339-6f53003d3250' && (
-            <div className="flex-shrink-0">
-              <select
-                id="client-select"
-                value={selectedClientUuid}
-                onChange={(e) => {
-                  const newClientUuid = e.target.value
-                  setSelectedClientUuid(newClientUuid)
-                  
-                  // Also update selectedClient object for display purposes
-                  const client = clients.find(c => c.uuid === newClientUuid)
-                  setSelectedClient(client || null)
-                  
-                  // Dashboard will automatically refresh via useEffect on selectedClientUuid change
-                  // This will reload organizations and any other client-specific data
-                }}
-                className="block w-48 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm bg-white"
-              >
-                <option value="">Select a client...</option>
-                {clients.map((client) => (
-                  <option key={client.uuid} value={client.uuid}>
-                    {client.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
 
         {/* Organizations Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
