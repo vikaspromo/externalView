@@ -7,6 +7,7 @@ import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/sup
 import { SortField, SortDirection } from '@/lib/types/dashboard'
 import { formatCurrency, formatDate, formatFieldValue } from '@/app/utils/formatters'
 import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
+import { EditableText } from '@/app/components/ui/EditableText'
 
 
 
@@ -233,6 +234,30 @@ export default function DashboardPage() {
     setExpandedRows(newExpandedRows)
   }
 
+  const updateOrgNotes = async (orgId: string, notes: string) => {
+    try {
+      // Update notes in the database
+      const { error } = await supabase
+        .from('client_org_history')
+        .update({ notes, updated_at: new Date().toISOString() })
+        .eq('client_uuid', selectedClientUuid)
+        .eq('org_uuid', orgId)
+
+      if (error) {
+        throw error
+      }
+
+      // Update local state
+      setOrgDetails(prev => ({
+        ...prev,
+        [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null
+      }))
+    } catch (error) {
+      console.error('Error updating notes:', error)
+      throw new Error('Failed to save notes')
+    }
+  }
+
   const fetchOrgDetails = async (orgId: string) => {
     try {
       // Fetch from client_org_history
@@ -455,10 +480,15 @@ export default function DashboardPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                       {/* Left side - Notes */}
                                       <div>
-                                        <h5 className="text-sm font-semibold text-gray-700 mb-2">Notes</h5>
-                                        <p className="text-sm text-gray-600">
-                                          {orgDetails[org.id]?.notes || 'No notes available'}
-                                        </p>
+                                        <EditableText
+                                          label="Notes"
+                                          value={orgDetails[org.id]?.notes || ''}
+                                          onSave={(newNotes) => updateOrgNotes(org.id, newNotes)}
+                                          placeholder="Add notes about this organization..."
+                                          multiline={true}
+                                          maxLength={2000}
+                                          className="text-sm"
+                                        />
                                       </div>
                                       
                                       {/* Right side - Key External Contacts */}
