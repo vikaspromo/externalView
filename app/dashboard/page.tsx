@@ -211,13 +211,10 @@ export default function DashboardPage() {
         const transformedOrgs = relationshipData?.map(rel => ({
           id: rel.org_uuid || '',
           name: (rel.organizations as any)?.name || '',
-          type: '', // organizations table doesn't have a type column
           alignment_score: rel.policy_alignment_score || 0,
           total_spend: rel.annual_total_spend || 0,
-          status: '', // status column was removed in migration
           owner: rel.relationship_owner || '',
           renewal_date: rel.renewal_date || '',
-          description: `Owner: ${rel.relationship_owner || 'Unassigned'}`,
           created_at: '',
           updated_at: ''
         })) || []
@@ -504,13 +501,8 @@ export default function DashboardPage() {
                                   </svg>
                                 )}
                               </button>
-                              <div>
-                                <div className="text-sm font-medium text-gray-900">
-                                  {org.name}
-                                </div>
-                                <div className="text-sm text-gray-500">
-                                  {org.type || 'Organization'}
-                                </div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {org.name}
                               </div>
                             </div>
                           </td>

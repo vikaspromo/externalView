@@ -11,13 +11,10 @@ export interface User {
 export interface Organization {
   id: string
   name: string
-  type?: string
   alignment_score?: number
   total_spend?: number
-  status?: string
   owner?: string
   renewal_date?: string
-  description?: string
   created_at: string
   updated_at: string
 }
