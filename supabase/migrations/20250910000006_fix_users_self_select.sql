@@ -29,8 +29,13 @@ USING (
 -- Also ensure the other policies exist and are correct
 -- These may have been dropped by the CASCADE in the volatile function fix
 
+-- Drop existing policies first to avoid conflicts
+DROP POLICY IF EXISTS "users_insert_policy" ON users;
+DROP POLICY IF EXISTS "users_update_policy" ON users;
+DROP POLICY IF EXISTS "users_delete_policy" ON users;
+
 -- INSERT: Only admins can create users, or users during registration
-CREATE POLICY IF NOT EXISTS "users_insert_policy" 
+CREATE POLICY "users_insert_policy" 
 ON users FOR INSERT 
 WITH CHECK (
   is_admin()
@@ -41,26 +46,19 @@ WITH CHECK (
 );
 
 -- UPDATE: Users can update their own profile, admins can update anyone
-CREATE POLICY IF NOT EXISTS "users_update_policy" 
+CREATE POLICY "users_update_policy" 
 ON users FOR UPDATE 
 USING (
-  deleted_at IS NULL
-  AND (
-    id::uuid = auth.uid() -- Own profile
-    OR is_admin()
-  )
+  id::uuid = auth.uid() -- Own profile
+  OR is_admin()
 )
 WITH CHECK (
-  -- Prevent changing client_uuid unless admin
-  (client_uuid = OLD.client_uuid OR is_admin())
-  AND (
-    id::uuid = auth.uid()
-    OR is_admin()
-  )
+  id::uuid = auth.uid()
+  OR is_admin()
 );
 
 -- DELETE: Only admins can delete users
-CREATE POLICY IF NOT EXISTS "users_delete_policy" 
+CREATE POLICY "users_delete_policy" 
 ON users FOR DELETE 
 USING (is_admin());
 
