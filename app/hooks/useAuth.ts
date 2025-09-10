@@ -43,13 +43,38 @@ export const useAuth = (): AuthState => {
           .eq('email', session.user.email)
           .single()
         
-        if (!allowedUser) {
-          await supabase.auth.signOut()
-          router.push('/')
+        if (allowedUser) {
+          setUserData(allowedUser as User)
           return
         }
-
-        setUserData(allowedUser as User)
+        
+        // If not in users table, check if they're an admin
+        const { data: adminUser } = await supabase
+          .from('user_admins')
+          .select('*')
+          .eq('email', session.user.email)
+          .eq('active', true)
+          .single()
+        
+        if (adminUser) {
+          // Create minimal user data for admin
+          const minimalUserData: User = {
+            id: session.user.id,
+            email: session.user.email,
+            company: 'Admin',
+            client_uuid: '', // Admins don't have a default client
+            active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          setUserData(minimalUserData)
+          return
+        }
+        
+        // User not authorized in either table
+        await supabase.auth.signOut()
+        router.push('/')
+        return
       } catch (error) {
         console.error('Auth error:', error)
         router.push('/')

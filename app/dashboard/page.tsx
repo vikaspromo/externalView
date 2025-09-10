@@ -40,21 +40,7 @@ export default function DashboardPage() {
 
         setUser(session.user)
         
-        // Get user details from users table
-        const { data: userData } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', session.user.email)
-          .single()
-        
-        if (!userData) {
-          router.push('/')
-          return
-        }
-        
-        setUserData(userData)
-        
-        // Check if user is an admin
+        // Check if user is an admin first
         const { data: adminData, error: adminError } = await supabase
           .from('user_admins')
           .select('email, active')
@@ -62,8 +48,40 @@ export default function DashboardPage() {
           .eq('active', true)
           .single()
         
-        if (!adminError && adminData) {
+        const isAdminUser = !adminError && adminData
+        if (isAdminUser) {
           setIsAdmin(true)
+        }
+        
+        // Get user details from users table
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', session.user.email)
+          .single()
+        
+        if (!userData && !isAdminUser) {
+          // Not in users table and not an admin - deny access
+          router.push('/')
+          return
+        }
+        
+        if (userData) {
+          // Regular user - use their data
+          setUserData(userData)
+        } else if (isAdminUser) {
+          // Admin user not in users table - create minimal user object
+          // Admins will select a client to view after loading
+          const minimalUserData = {
+            id: session.user.id,
+            email: session.user.email,
+            company: 'Admin',
+            client_uuid: '', // No default client for admins
+            active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }
+          setUserData(minimalUserData as any)
         }
         
         // Initialize organizations as empty - will be loaded after client selection
@@ -82,7 +100,7 @@ export default function DashboardPage() {
           setClients(clientsData || [])
           
           // Set the user's client UUID as the default selected client UUID
-          if (userData.client_uuid) {
+          if (userData?.client_uuid) {
             setSelectedClientUuid(userData.client_uuid)
             
             // Also set the selectedClient object for display purposes
@@ -92,6 +110,10 @@ export default function DashboardPage() {
                 setSelectedClient(userClient)
               }
             }
+          } else if (isAdminUser && clientsData && clientsData.length > 0) {
+            // For admins without a default client, select the first available client
+            setSelectedClientUuid(clientsData[0].uuid)
+            setSelectedClient(clientsData[0])
           }
         }
       } catch (error) {
