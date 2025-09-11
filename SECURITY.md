@@ -28,7 +28,16 @@
      - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (new value)
      - `SUPABASE_SERVICE_KEY` (new value)
 
-4. **Update Local Development**
+4. **Update Vercel Environment Variables** (CRITICAL for production)
+   - Go to: https://vercel.com/dashboard → Your Project → Settings → Environment Variables
+   - Update these variables for all environments (Production, Preview, Development):
+     - `NEXT_PUBLIC_SUPABASE_URL` (stays the same)
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (new value)
+     - `SUPABASE_SERVICE_KEY` (new value)
+   - Click "Save" for each variable
+   - **Redeploy** to apply changes: Deployments → Three dots → Redeploy
+
+5. **Update Local Development**
    - Copy `.env.example` to `.env.local`
    - Add the new keys to `.env.local`
    - **NEVER** commit `.env.local` to Git
