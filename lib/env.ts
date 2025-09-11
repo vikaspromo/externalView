@@ -68,17 +68,22 @@ export function validateEnv(): EnvConfig {
     NEXT_PUBLIC_SUPABASE_URL: getRequiredEnv('NEXT_PUBLIC_SUPABASE_URL'),
     NEXT_PUBLIC_SUPABASE_ANON_KEY: getRequiredEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY'),
     
-    // Optional server variables
-    SUPABASE_SERVICE_ROLE_KEY: getOptionalEnv('SUPABASE_SERVICE_ROLE_KEY'),
-    DATABASE_URL: getOptionalEnv('DATABASE_URL'),
-    
-    // Optional services
-    ANTHROPIC_API_KEY: getOptionalEnv('ANTHROPIC_API_KEY'),
-    SENTRY_DSN: getOptionalEnv('SENTRY_DSN'),
-    
     // Environment
     NODE_ENV: (process.env.NODE_ENV as EnvConfig['NODE_ENV']) || 'development',
   }
+  
+  // Add optional properties only if they have values
+  const serviceKey = getOptionalEnv('SUPABASE_SERVICE_ROLE_KEY')
+  if (serviceKey) config.SUPABASE_SERVICE_ROLE_KEY = serviceKey
+  
+  const dbUrl = getOptionalEnv('DATABASE_URL')
+  if (dbUrl) config.DATABASE_URL = dbUrl
+  
+  const anthropicKey = getOptionalEnv('ANTHROPIC_API_KEY')
+  if (anthropicKey) config.ANTHROPIC_API_KEY = anthropicKey
+  
+  const sentryDsn = getOptionalEnv('SENTRY_DSN')
+  if (sentryDsn) config.SENTRY_DSN = sentryDsn
 
   // Additional validation
   if (config.NODE_ENV === 'production') {
