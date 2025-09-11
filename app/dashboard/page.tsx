@@ -5,7 +5,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 import { SortField, SortDirection } from '@/lib/types/dashboard'
-import { formatCurrency, formatDate, formatFieldValue } from '@/app/utils/formatters'
+import { formatCurrency, formatDate } from '@/app/utils/formatters'
 import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
 import { Pagination } from '@/app/components/ui/Pagination'
@@ -126,8 +126,11 @@ export default function DashboardPage() {
             }
           } else if (isAdminUser && clientsData && clientsData.length > 0) {
             // For admins without a default client, select the first available client
-            setSelectedClientUuid(clientsData[0].uuid)
-            setSelectedClient(clientsData[0])
+            const firstClient = clientsData[0]
+            if (firstClient) {
+              setSelectedClientUuid(firstClient.uuid)
+              setSelectedClient(firstClient)
+            }
           }
         }
       } catch (error) {
