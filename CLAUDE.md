@@ -23,17 +23,24 @@
 ### CRITICAL: Migration File Naming
 **ALWAYS name migration files with datetime timestamp: `YYYYMMDD_HHMMSS_description.sql`**
 
+**IMPORTANT: Use the CURRENT Eastern Time (EST/EDT) when creating the timestamp.**
+- Get current EST time: `date "+%Y%m%d_%H%M%S" --date="now EST"`
+- The HHMMSS must be the actual time in EST, not a sequence number
+- This ensures chronological ordering even across time zones
+
 ```bash
 # Format: YYYYMMDD_HHMMSS_description.sql
+# Where HHMMSS = actual EST time (hours, minutes, seconds)
 
-# CORRECT examples:
-20250111_143025_add_user_table.sql          ✅
-20250111_090512_fix_rls_policies.sql        ✅
-20250111_235959_update_audit_log.sql        ✅
+# CORRECT examples (with actual EST timestamps):
+20250111_143025_add_user_table.sql          ✅ (2:30:25 PM EST)
+20250111_090512_fix_rls_policies.sql        ✅ (9:05:12 AM EST)
+20250111_235959_update_audit_log.sql        ✅ (11:59:59 PM EST)
 
 # WRONG examples:
 20250111_add_user_table.sql                 ❌ (missing time)
-20250111000001_add_user_table.sql           ❌ (sequence number instead of time)
+20250111000001_add_user_table.sql           ❌ (sequence number, not actual time)
+20250111_120000_add_user_table.sql          ❌ (fake/rounded time, use actual time)
 add_user_table.sql                          ❌ (no timestamp)
 ```
 
