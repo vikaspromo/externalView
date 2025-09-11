@@ -87,6 +87,10 @@ async function processOrganization(org: Organization): Promise<void> {
   // Handle single match
   if (topMatches.length === 1) {
     const match = topMatches[0]
+    if (!match) {
+      console.log('  ⚠️ No valid match found')
+      return
+    }
     console.log(`  ✅ Single match: ${match.name} (EIN: ${match.strein})`)
     
     const { error } = await supabase
@@ -124,10 +128,15 @@ async function processOrganization(org: Organization): Promise<void> {
   const nameGroups = Array.from(groupedByName.entries())
   
   for (let i = 0; i < nameGroups.length; i++) {
-    const [, matches] = nameGroups[i]
+    const nameGroup = nameGroups[i]
+    if (!nameGroup) continue
+    
+    const [, matches] = nameGroup
     
     // Use the first match's exact name (with original capitalization)
     const primaryMatch = matches[0]
+    if (!primaryMatch) continue
+    
     const groupEins = matches.map(m => m.strein)
     
     if (i === 0) {
