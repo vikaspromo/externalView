@@ -102,8 +102,8 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
     })
 
     // Extract the JSON from the response
-    const content = message.content[0]
-    if (content.type !== 'text') {
+    const content = message.content && message.content[0]
+    if (!content || !('type' in content) || content.type !== 'text') {
       console.error('Unexpected response type from Claude')
       return null
     }
