@@ -5,8 +5,8 @@
 -- Error: "INSERT is not allowed in a non-volatile function"
 -- ============================================================================
 
--- Drop the existing function
-DROP FUNCTION IF EXISTS user_has_client_access(UUID);
+-- Drop the existing function with CASCADE to handle dependencies
+DROP FUNCTION IF EXISTS user_has_client_access(UUID) CASCADE;
 
 -- Recreate the function without INSERT/UPDATE operations
 CREATE OR REPLACE FUNCTION user_has_client_access(p_client_uuid UUID)
@@ -172,6 +172,72 @@ DROP FUNCTION IF EXISTS check_rate_limit(UUID, INTEGER);
 
 -- Grant permission on the new function
 GRANT EXECUTE ON FUNCTION is_rate_limited(UUID, INTEGER) TO authenticated;
+
+-- ============================================================================
+-- RECREATE POLICIES THAT WERE DROPPED WITH CASCADE
+-- ============================================================================
+
+-- Since policies were already created in previous migration, we only need to 
+-- recreate them if they were actually dropped by the CASCADE
+DO $$
+BEGIN
+  -- Clients policies
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'clients' AND policyname = 'clients_select_policy') THEN
+    EXECUTE 'CREATE POLICY "clients_select_policy" ON clients FOR SELECT USING (user_has_client_access(uuid) AND deleted_at IS NULL)';
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'clients' AND policyname = 'clients_update_policy') THEN
+    EXECUTE 'CREATE POLICY "clients_update_policy" ON clients FOR UPDATE USING (user_has_client_access(uuid) AND deleted_at IS NULL) WITH CHECK (user_has_client_access(uuid))';
+  END IF;
+
+  -- Users policies
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'users' AND policyname = 'users_select_policy') THEN
+    EXECUTE 'CREATE POLICY "users_select_policy" ON users FOR SELECT USING (user_has_client_access(client_uuid) OR id::uuid = auth.uid() OR is_admin())';
+  END IF;
+
+  -- Client Organization History policies
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'client_org_history' AND policyname = 'client_org_history_select_policy') THEN
+    EXECUTE 'CREATE POLICY "client_org_history_select_policy" ON client_org_history FOR SELECT USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'client_org_history' AND policyname = 'client_org_history_update_policy') THEN
+    EXECUTE 'CREATE POLICY "client_org_history_update_policy" ON client_org_history FOR UPDATE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL) WITH CHECK (user_has_client_access(client_uuid))';
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'client_org_history' AND policyname = 'client_org_history_delete_policy') THEN
+    EXECUTE 'CREATE POLICY "client_org_history_delete_policy" ON client_org_history FOR DELETE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+  END IF;
+
+  -- Stakeholder Contacts policies (if table exists)
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'stakeholder_contacts') THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_contacts' AND policyname = 'stakeholder_contacts_select_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_contacts_select_policy" ON stakeholder_contacts FOR SELECT USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_contacts' AND policyname = 'stakeholder_contacts_update_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_contacts_update_policy" ON stakeholder_contacts FOR UPDATE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL) WITH CHECK (user_has_client_access(client_uuid))';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_contacts' AND policyname = 'stakeholder_contacts_delete_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_contacts_delete_policy" ON stakeholder_contacts FOR DELETE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+    END IF;
+  END IF;
+
+  -- Stakeholder Notes policies (if table exists)  
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'stakeholder_notes') THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_notes' AND policyname = 'stakeholder_notes_select_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_notes_select_policy" ON stakeholder_notes FOR SELECT USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_notes' AND policyname = 'stakeholder_notes_update_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_notes_update_policy" ON stakeholder_notes FOR UPDATE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL) WITH CHECK (user_has_client_access(client_uuid))';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'stakeholder_notes' AND policyname = 'stakeholder_notes_delete_policy') THEN
+      EXECUTE 'CREATE POLICY "stakeholder_notes_delete_policy" ON stakeholder_notes FOR DELETE USING (user_has_client_access(client_uuid) AND deleted_at IS NULL)';
+    END IF;
+  END IF;
+END $$;
 
 -- ============================================================================
 -- VERIFICATION
