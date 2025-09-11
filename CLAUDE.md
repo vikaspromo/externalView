@@ -1,5 +1,23 @@
 # Claude Code Instructions for ExternalView Project
 
+## Documentation Strategy
+
+**IMPORTANT: Always consolidate new documentation into README.md rather than creating separate documentation files.**
+
+### Guidelines:
+- All project documentation should be added to README.md as new sections or subsections
+- Keep README.md as the single source of truth for project documentation
+- Organize content in README.md using proper markdown sections and hierarchy
+- Only create separate documentation files when:
+  - The user explicitly asks for a separate file
+  - Technical requirements demand it (e.g., API docs that must be in a specific location)
+
+### Why This Matters:
+- Prevents documentation sprawl across multiple files
+- Makes it easier to find and maintain documentation
+- Reduces duplication and conflicts
+- Provides a single entry point for new developers
+
 ## Database Migrations
 
 ### IMPORTANT: Creating New Migrations
