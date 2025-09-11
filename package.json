@@ -9,7 +9,10 @@
     "lint": "next lint",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "check:env": "node scripts/check-env.js",
+    "predev": "npm run check:env",
+    "prebuild": "npm run check:env"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.61.0",
