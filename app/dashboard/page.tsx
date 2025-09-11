@@ -41,11 +41,12 @@ export default function DashboardPage() {
 
         setUser(session.user)
         
+        // CRITICAL FIX: Use auth.uid() instead of email to prevent JWT spoofing
         // Check if user is an admin first
         const { data: adminData, error: adminError } = await supabase
           .from('user_admins')
-          .select('email, active')
-          .eq('email', session.user.email)
+          .select('user_id, active')
+          .eq('user_id', session.user.id)  // Use uid, not email!
           .eq('active', true)
           .single()
         
