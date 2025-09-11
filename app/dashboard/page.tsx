@@ -8,6 +8,7 @@ import { SortField, SortDirection } from '@/lib/types/dashboard'
 import { formatCurrency, formatDate, formatFieldValue } from '@/app/utils/formatters'
 import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
+import { Pagination } from '@/app/components/ui/Pagination'
 
 
 
@@ -26,6 +27,8 @@ export default function DashboardPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [orgDetails, setOrgDetails] = useState<Record<string, (ClientOrganizationHistory & { positions?: any[] }) | null>>({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(100) // Limit to 100 items per page
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -219,6 +222,15 @@ export default function DashboardPage() {
     return sorted
   }, [organizations, sortField, sortDirection])
 
+  // Paginated organizations
+  const paginatedOrganizations = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return sortedOrganizations.slice(startIndex, endIndex)
+  }, [sortedOrganizations, currentPage, itemsPerPage])
+
+  const totalPages = Math.ceil(sortedOrganizations.length / itemsPerPage)
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       // Toggle direction if clicking the same field
@@ -228,6 +240,14 @@ export default function DashboardPage() {
       setSortField(field)
       setSortDirection('desc')
     }
+    // Reset to first page when sorting changes
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top of table
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const toggleRowExpansion = async (orgId: string) => {
@@ -343,6 +363,7 @@ export default function DashboardPage() {
                   onClientChange={(client) => {
                     setSelectedClientUuid(client.uuid)
                     setSelectedClient(client)
+                    setCurrentPage(1) // Reset pagination when changing clients
                   }}
                 />
               )}
@@ -486,7 +507,7 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {sortedOrganizations.map((org) => (
+                    {paginatedOrganizations.map((org) => (
                       <React.Fragment key={org.id}>
                         <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => toggleRowExpansion(org.id)}>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -650,6 +671,16 @@ export default function DashboardPage() {
                     ))}
                   </tbody>
                 </table>
+                {/* Pagination */}
+                {sortedOrganizations.length > itemsPerPage && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={sortedOrganizations.length}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             ) : (
               <div className="text-center py-12">
