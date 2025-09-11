@@ -13,13 +13,16 @@
 ### Step 1: Rotate Supabase Keys
 
 1. **Access Supabase Dashboard**
-   - Go to: https://app.supabase.com/project/vohyhkjygvkaxlmqkbem/settings/api
+   - Go to: https://app.supabase.com/project/vohyhkjygvkaxlmqkbem/settings/api-keys
+   - Or navigate: Project Settings → API Keys (in left sidebar)
    - Sign in with admin credentials
 
 2. **Regenerate All Keys**
-   - Click "Regenerate anon key" → Confirm
-   - Click "Regenerate service_role key" → Confirm
-   - Save the new keys securely (password manager recommended)
+   - In the "Project API Keys" section:
+   - Find "anon public" key → Click refresh/regenerate icon → Confirm
+   - Find "service_role" key → Click refresh/regenerate icon → Confirm
+   - Copy and save the new keys securely (password manager recommended)
+   - Note: The Project URL stays the same, only keys change
 
 3. **Update GitHub Secrets**
    - Navigate to: Settings → Secrets and variables → Actions
