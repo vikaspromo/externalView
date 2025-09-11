@@ -207,7 +207,6 @@ USING (
 )
 WITH CHECK (
   user_has_client_access(uuid)
-  AND uuid = OLD.uuid -- Prevent changing client UUID
 );
 
 -- DELETE: Only admins can delete clients (soft delete)
@@ -250,9 +249,8 @@ USING (
   )
 )
 WITH CHECK (
-  -- Prevent changing client_uuid
-  client_uuid = OLD.client_uuid
-  AND (
+  -- Ensure user has access
+  (
     id::uuid = auth.uid()
     OR is_admin()
   )
@@ -290,9 +288,7 @@ USING (
   AND deleted_at IS NULL
 )
 WITH CHECK (
-  -- Prevent changing client_uuid
-  client_uuid = OLD.client_uuid
-  AND user_has_client_access(client_uuid)
+  user_has_client_access(client_uuid)
 );
 
 -- DELETE: Users can remove organizations from their client
@@ -460,8 +456,7 @@ USING (
   AND deleted_at IS NULL
 )
 WITH CHECK (
-  client_uuid = OLD.client_uuid
-  AND user_has_client_access(client_uuid)
+  user_has_client_access(client_uuid)
 );
 
 -- DELETE: Users can delete their client's contacts
@@ -499,8 +494,7 @@ USING (
   AND deleted_at IS NULL
 )
 WITH CHECK (
-  client_uuid = OLD.client_uuid
-  AND user_has_client_access(client_uuid)
+  user_has_client_access(client_uuid)
 );
 
 -- DELETE: Users can delete their client's notes
