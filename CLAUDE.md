@@ -20,34 +20,27 @@
 
 ## Database Migrations
 
-### IMPORTANT: Creating New Migrations
-**ALWAYS use the migration script for creating new database migrations:**
+### CRITICAL: Migration File Naming
+**ALWAYS name migration files with datetime timestamp: `YYYYMMDD_HHMMSS_description.sql`**
 
 ```bash
-# DO THIS:
-./scripts/create-migration.sh "description of change"
+# Format: YYYYMMDD_HHMMSS_description.sql
 
-# Example:
-./scripts/create-migration.sh "add user preferences table"
-# Creates: supabase/migrations/20250910_164523_add_user_preferences_table.sql
-```
+# CORRECT examples:
+20250111_143025_add_user_table.sql          ✅
+20250111_090512_fix_rls_policies.sql        ✅
+20250111_235959_update_audit_log.sql        ✅
 
-**NEVER create migration files directly:**
-```bash
-# DON'T DO THIS:
-Write: supabase/migrations/20250910_my_migration.sql  # ❌ Wrong
+# WRONG examples:
+20250111_add_user_table.sql                 ❌ (missing time)
+20250111000001_add_user_table.sql           ❌ (sequence number instead of time)
+add_user_table.sql                          ❌ (no timestamp)
 ```
 
 ### Why This Matters:
-- Ensures consistent timestamp naming (YYYYMMDD_HHMMSS_description.sql)
-- Migrations run in correct chronological order
-- Prevents naming conflicts
-- Follows team conventions
-
-### After Creating a Migration:
-1. The script creates a template file with proper naming
-2. Edit the file to add your SQL commands
-3. Test the migration locally before committing
+- Ensures migrations run in exact chronological order
+- Prevents naming conflicts when multiple changes happen same day
+- Makes rollbacks easier to identify and execute
 
 ## Other Project Conventions
 
