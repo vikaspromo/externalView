@@ -20,12 +20,21 @@
    - Sign in with admin credentials
 
 2. **Regenerate All Keys**
-   - You should see "Project API keys" section with:
-     - Project URL (keep this the same)
-     - anon (public) key → Look for "Roll" or refresh button → Confirm
-     - service_role (secret) key → Look for "Roll" or refresh button → Confirm
+   - In the "Project API keys" section, look for:
+     - **Option A**: "Generate new JWT secret" button at the top
+     - **Option B**: Three dots menu (⋮) or settings icon next to each key
+     - **Option C**: "Regenerate JWT Secret" in a separate JWT section
+     - **Option D**: If no regenerate option visible:
+       - Check "JWT Settings" or "JWT Keys" in left nav
+       - Or go to Authentication → Configuration → JWT
+   
+   - **Alternative Method** (if UI doesn't show regenerate):
+     - You may need to generate a new JWT secret first
+     - This will automatically create new anon and service_role keys
+     - Look for "Generate new JWT secret" or similar option
+   
    - Copy and save the new keys immediately (password manager recommended)
-   - Note: Keys might be partially hidden with "Reveal" button
+   - Note: Keys might be partially hidden with "Reveal" or eye icon
 
 3. **Update GitHub Secrets**
    - Navigate to: Settings → Secrets and variables → Actions
