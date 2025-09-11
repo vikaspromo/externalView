@@ -20,6 +20,19 @@
 
 ## Database Migrations
 
+### Migration Organization Structure
+**NEW MIGRATIONS GO DIRECTLY IN: `supabase/migrations/`**
+
+The migrations folder is organized as follows:
+```
+supabase/migrations/
+├── MIGRATION_BASELINE.md           # Documentation of the baseline
+├── migrations_pre_audit_log/       # All migrations before Sept 11, 2025
+│   └── [18 historical migrations]  # RLS + Audit implementation
+├── backup/                         # Unused/experimental migrations
+└── [YOUR NEW MIGRATIONS HERE]      # All new migrations go in root
+```
+
 ### CRITICAL: Migration File Naming
 **ALWAYS name migration files with datetime timestamp: `YYYYMMDD_HHMMSS_description.sql`**
 
@@ -27,9 +40,9 @@
 # Format: YYYYMMDD_HHMMSS_description.sql
 
 # CORRECT examples:
-20250111_143025_add_user_table.sql          ✅
-20250111_090512_fix_rls_policies.sql        ✅
-20250111_235959_update_audit_log.sql        ✅
+20250912_143025_add_user_table.sql          ✅
+20250913_090512_fix_rls_policies.sql        ✅
+20250914_235959_update_audit_log.sql        ✅
 
 # WRONG examples:
 20250111_add_user_table.sql                 ❌ (missing time)
@@ -37,10 +50,16 @@
 add_user_table.sql                          ❌ (no timestamp)
 ```
 
-### Why This Matters:
-- Ensures migrations run in exact chronological order
-- Prevents naming conflicts when multiple changes happen same day
-- Makes rollbacks easier to identify and execute
+### Where to Place New Migrations
+- **NEW migrations**: Place directly in `supabase/migrations/` (NOT in subdirectories)
+- **Historical migrations**: Already archived in `migrations_pre_audit_log/`
+- **Test/experimental**: Can go in `backup/` if not for production
+
+### Why This Organization:
+- Clean workspace for new development
+- Historical migrations preserved but out of the way
+- Supabase will still find and run all migrations (searches subdirectories)
+- Clear separation between "before" and "after" audit implementation
 
 ## Other Project Conventions
 
