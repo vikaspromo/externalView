@@ -2,7 +2,7 @@
  * Custom hook for managing client data
  */
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Client } from '@/lib/supabase/types'
 

@@ -2,7 +2,7 @@
  * Custom hook for managing organizations data
  */
 
-import { useEffect, useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Organization, ClientOrganizationHistory } from '@/lib/supabase/types'
 
