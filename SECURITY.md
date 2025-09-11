@@ -19,22 +19,37 @@
    - Alternative: Try direct link: https://app.supabase.com/project/vohyhkjygvkaxlmqkbem/settings/api
    - Sign in with admin credentials
 
-2. **Regenerate All Keys**
-   - In the "Project API keys" section, look for:
-     - **Option A**: "Generate new JWT secret" button at the top
-     - **Option B**: Three dots menu (⋮) or settings icon next to each key
-     - **Option C**: "Regenerate JWT Secret" in a separate JWT section
-     - **Option D**: If no regenerate option visible:
-       - Check "JWT Settings" or "JWT Keys" in left nav
-       - Or go to Authentication → Configuration → JWT
+2. **Create New Secure API Keys** (Supabase's New Approach)
    
-   - **Alternative Method** (if UI doesn't show regenerate):
-     - You may need to generate a new JWT secret first
-     - This will automatically create new anon and service_role keys
-     - Look for "Generate new JWT secret" or similar option
+   **IMPORTANT**: Supabase now recommends using their new API Keys system instead of regenerating JWT secrets. This provides better security with zero downtime.
+
+   **Step A: Go to API Keys**
+   - From JWT Keys page, click "Go to API Keys" button
+   - Or navigate to Settings → API Keys in left sidebar
    
-   - Copy and save the new keys immediately (password manager recommended)
-   - Note: Keys might be partially hidden with "Reveal" or eye icon
+   **Step B: Create New API Keys**
+   - Look for "Create API Key" or "Add API Key" button
+   - Create two new keys:
+     1. **Public/Anon Key**: 
+        - Name: "anon-key-[date]" (e.g., "anon-key-20250111")
+        - Role: Select "anon"
+        - Copy the generated key immediately
+     2. **Service Role Key**:
+        - Name: "service-key-[date]" (e.g., "service-key-20250111")
+        - Role: Select "service_role"
+        - Copy the generated key immediately
+   
+   **Step C: Delete Old Exposed Keys**
+   - After updating all environments with new keys
+   - Find the old keys in the API Keys list
+   - Delete/revoke them (this locks out any unauthorized users)
+   
+   **Advantages of This Approach**:
+   - Zero downtime - users stay signed in
+   - Immediate revocation of compromised keys
+   - Full audit logs of key usage
+   - SOC2 compliance ready
+   - Keys are no longer visible to organization members
 
 3. **Update GitHub Secrets**
    - Navigate to: Settings → Secrets and variables → Actions
