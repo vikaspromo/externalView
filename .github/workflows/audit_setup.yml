@@ -1,0 +1,72 @@
+name: Setup Audit Logging
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'check'
+        type: choice
+        options:
+          - check
+          - apply
+          - test
+
+jobs:
+  audit-setup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      
+      - name: Check current database structure
+        if: github.event.inputs.action == 'check'
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+        run: |
+          echo "=== Checking existing tables ==="
+          psql "$DATABASE_URL" -c "
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            ORDER BY table_name;
+          "
+          
+          echo "=== Checking security_audit_log structure ==="
+          psql "$DATABASE_URL" -c "
+            SELECT column_name, data_type, is_nullable
+            FROM information_schema.columns 
+            WHERE table_name = 'security_audit_log'
+            ORDER BY ordinal_position;
+          "
+          
+          echo "=== Checking user_admins structure ==="
+          psql "$DATABASE_URL" -c "
+            SELECT column_name, data_type, is_nullable
+            FROM information_schema.columns 
+            WHERE table_name = 'user_admins'
+            ORDER BY ordinal_position;
+          "
+      
+      - name: Apply audit logging migration
+        if: github.event.inputs.action == 'apply'
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+        run: |
+          echo "Applying audit logging migration..."
+          psql "$DATABASE_URL" -f supabase/migrations/20250111_comprehensive_audit_logging_fixed.sql
+          
+      - name: Test audit logging
+        if: github.event.inputs.action == 'test'
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+        run: |
+          echo "Testing audit logging..."
+          psql "$DATABASE_URL" -f supabase/migrations/20250111_audit_logging_test_cases.sql
