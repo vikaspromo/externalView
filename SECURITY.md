@@ -19,51 +19,58 @@
    - Alternative: Try direct link: https://app.supabase.com/project/vohyhkjygvkaxlmqkbem/settings/api
    - Sign in with admin credentials
 
-2. **Create New Secure API Keys** (Supabase's New Approach)
+2. **Create New Secure API Keys** (Supabase's New API System)
    
-   **IMPORTANT**: Supabase now recommends using their new API Keys system instead of regenerating JWT secrets. This provides better security with zero downtime.
+   **IMPORTANT**: Supabase has replaced the old JWT keys with a new API Keys system:
+   - **Publishable key** = replaces `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **Secret key** = replaces `SUPABASE_SERVICE_KEY`
 
-   **Step A: Go to API Keys**
-   - From JWT Keys page, click "Go to API Keys" button
-   - Or navigate to Settings → API Keys in left sidebar
+   **Step A: Create a New Secret Key**
+   - Click "Add new secret key" button
+   - Name it with date: e.g., "production-20250111"
+   - Add description: "Replacement for exposed key"
+   - Copy the full key immediately (starts with `sb_secret_`)
+   - This replaces your old `SUPABASE_SERVICE_KEY`
    
-   **Step B: Create New API Keys**
-   - Look for "Create API Key" or "Add API Key" button
-   - Create two new keys:
-     1. **Public/Anon Key**: 
-        - Name: "anon-key-[date]" (e.g., "anon-key-20250111")
-        - Role: Select "anon"
-        - Copy the generated key immediately
-     2. **Service Role Key**:
-        - Name: "service-key-[date]" (e.g., "service-key-20250111")
-        - Role: Select "service_role"
-        - Copy the generated key immediately
+   **Step B: Use the Publishable Key**
+   - The publishable key shown (starts with `sb_publishable_`) is safe for browser use
+   - This replaces your old `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - Copy: `sb_publishable_VvWY6QUgU1DormLJCIi79w_qWxex6L9`
    
-   **Step C: Delete Old Exposed Keys**
-   - After updating all environments with new keys
-   - Find the old keys in the API Keys list
-   - Delete/revoke them (this locks out any unauthorized users)
+   **Step C: Update Your Code**
+   You'll need to update how you initialize Supabase client:
+   ```javascript
+   // Old way (remove this):
+   createClient(url, anon_key)
    
-   **Advantages of This Approach**:
-   - Zero downtime - users stay signed in
-   - Immediate revocation of compromised keys
-   - Full audit logs of key usage
+   // New way (use this):
+   createClient(url, publishable_key) // for browser
+   createClient(url, secret_key)      // for server-side only
+   ```
+   
+   **Step D: Delete the Old "default" Secret Key**
+   - After confirming everything works with new keys
+   - Delete the "default" secret key to revoke access
+   
+   **Advantages**:
+   - Immediate revocation without affecting users
+   - Full audit trail of API usage
+   - Keys can't be decoded to reveal project info
    - SOC2 compliance ready
-   - Keys are no longer visible to organization members
 
 3. **Update GitHub Secrets**
    - Navigate to: Settings → Secrets and variables → Actions
-   - Update these secrets with new values:
-     - `NEXT_PUBLIC_SUPABASE_URL` (stays the same)
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (new value)
-     - `SUPABASE_SERVICE_KEY` (new value)
+   - Update these secrets:
+     - `NEXT_PUBLIC_SUPABASE_URL` (stays the same: `https://vohyhkjygvkaxlmqkbem.supabase.co`)
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → Use publishable key: `sb_publishable_VvWY6QUgU1DormLJCIi79w_qWxex6L9`
+     - `SUPABASE_SERVICE_KEY` → Use your NEW secret key: `sb_secret_[your-new-key]`
 
 4. **Update Vercel Environment Variables** (CRITICAL for production)
    - Go to: https://vercel.com/dashboard → Your Project → Settings → Environment Variables
    - Update these variables for all environments (Production, Preview, Development):
-     - `NEXT_PUBLIC_SUPABASE_URL` (stays the same)
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (new value)
-     - `SUPABASE_SERVICE_KEY` (new value)
+     - `NEXT_PUBLIC_SUPABASE_URL` (stays the same: `https://vohyhkjygvkaxlmqkbem.supabase.co`)
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → Use publishable key: `sb_publishable_VvWY6QUgU1DormLJCIi79w_qWxex6L9`
+     - `SUPABASE_SERVICE_KEY` → Use your NEW secret key: `sb_secret_[your-new-key]`
    - Click "Save" for each variable
    - **Redeploy** to apply changes: Deployments → Three dots → Redeploy
 
