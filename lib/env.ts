@@ -113,7 +113,7 @@ export function getEnv(): EnvConfig {
 
 // Type-safe environment variable access
 export const env = new Proxy({} as EnvConfig, {
-  get(target, prop: string) {
+  get(_, prop: string) {
     const config = getEnv()
     return config[prop as keyof EnvConfig]
   },
