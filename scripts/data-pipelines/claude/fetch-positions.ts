@@ -1,6 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabase } from '../shared/database'
-import { PROPUBLICA_CONFIG } from '../propublica/types'
 
 // Interface for position data structure
 interface Position {

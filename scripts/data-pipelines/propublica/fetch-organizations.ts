@@ -1,7 +1,6 @@
 import { supabase } from '../shared/database'
 import { delay, API_DELAYS } from '../shared/rate-limiter'
 import { 
-  ProPublicaOrganization, 
   ProPublicaSearchResponse, 
   PROPUBLICA_CONFIG, 
 } from './types'
