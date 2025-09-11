@@ -234,6 +234,10 @@ async function main() {
   // Process each organization
   for (let i = 0; i < organizations.length; i++) {
     const org = organizations[i]
+    if (!org) {
+      console.log(`Skipping index ${i}: organization is undefined`)
+      continue
+    }
     console.log('='.repeat(80))
     console.log(`Processing ${i + 1} of ${organizations.length}: ${org.name}`)
     console.log(`EIN: ${org.ein || 'No EIN'}`)
