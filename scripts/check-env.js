@@ -41,7 +41,7 @@ const envExists = fs.existsSync(envPath)
 
 if (!envExists) {
   console.log(`${colors.yellow}⚠️  Warning: No .env.local file found${colors.reset}`)
-  console.log(`   Create one by copying .env.example:`)
+  console.log('   Create one by copying .env.example:')
   console.log(`   ${colors.blue}cp .env.example .env.local${colors.reset}\n`)
   hasWarnings = true
 }
@@ -73,7 +73,7 @@ optionalVars.forEach(varName => {
   } else {
     console.log(`  ${colors.yellow}○${colors.reset} ${varName}: not set`)
     if (varName === 'NEXT_PUBLIC_APP_URL') {
-      console.log(`    (will default to http://localhost:3000)`)
+      console.log('    (will default to http://localhost:3000)')
     }
   }
 })
@@ -93,14 +93,14 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
 console.log('\n' + '='.repeat(50))
 if (hasErrors) {
   console.log(`${colors.red}❌ Environment validation failed!${colors.reset}`)
-  console.log(`   Please set all required environment variables.`)
-  console.log(`   See .env.example for documentation.`)
+  console.log('   Please set all required environment variables.')
+  console.log('   See .env.example for documentation.')
   process.exit(1)
 } else if (hasWarnings) {
   console.log(`${colors.yellow}⚠️  Environment validation passed with warnings${colors.reset}`)
-  console.log(`   The application will run but some features may not work.`)
+  console.log('   The application will run but some features may not work.')
 } else {
   console.log(`${colors.green}✅ Environment validation passed!${colors.reset}`)
-  console.log(`   All required environment variables are set.`)
+  console.log('   All required environment variables are set.')
 }
 console.log('='.repeat(50))

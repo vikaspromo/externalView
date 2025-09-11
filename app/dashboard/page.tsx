@@ -85,7 +85,7 @@ export default function DashboardPage() {
             client_uuid: '', // No default client for admins
             active: true,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           }
           setUserData(minimalUserData as any)
         }
@@ -173,7 +173,7 @@ export default function DashboardPage() {
           owner: rel.relationship_owner || '',
           renewal_date: rel.renewal_date || '',
           created_at: '',
-          updated_at: ''
+          updated_at: '',
         })) || []
         setOrganizations(transformedOrgs)
       }
@@ -280,7 +280,7 @@ export default function DashboardPage() {
       // Update local state
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null
+        [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null,
       }))
     } catch (error) {
       console.error('Error updating notes:', error)
@@ -309,24 +309,24 @@ export default function DashboardPage() {
         console.error('Error fetching organization details:', historyError)
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: null
+          [orgId]: null,
         }))
       } else {
         // Combine history data with positions
         const combinedData = {
           ...(historyData as ClientOrganizationHistory),
-          positions: positionsData?.positions || []
+          positions: positionsData?.positions || [],
         }
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: combinedData
+          [orgId]: combinedData,
         }))
       }
     } catch (error) {
       console.error('Unexpected error in fetchOrgDetails:', error)
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: null
+        [orgId]: null,
       }))
     }
   }  // End of fetchOrgDetails function
@@ -603,9 +603,9 @@ export default function DashboardPage() {
                                           const order: { [key: string]: number } = {
                                             'In favor': 1,
                                             'Opposed': 2,
-                                            'No position': 3
-                                          };
-                                          return (order[a.position] || 999) - (order[b.position] || 999);
+                                            'No position': 3,
+                                          }
+                                          return (order[a.position] || 999) - (order[b.position] || 999)
                                         }).map((position: any, index: number) => (
                                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                                             {/* Position Header */}

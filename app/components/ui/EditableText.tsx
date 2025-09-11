@@ -22,7 +22,7 @@ export function EditableText({
   className = '',
   multiline = false,
   disabled = false,
-  label
+  label,
 }: EditableTextProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value)

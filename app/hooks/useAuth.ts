@@ -67,7 +67,7 @@ export const useAuth = (): AuthState => {
             client_uuid: '', // Admins don't have a default client
             active: true,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           }
           setUserData(minimalUserData)
           return
@@ -97,6 +97,6 @@ export const useAuth = (): AuthState => {
     user,
     userData,
     isLoading,
-    signOut
+    signOut,
   }
 }

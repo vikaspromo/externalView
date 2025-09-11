@@ -97,9 +97,9 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
       messages: [
         {
           role: 'user',
-          content: buildPrompt(orgName, ein)
-        }
-      ]
+          content: buildPrompt(orgName, ein),
+        },
+      ],
     })
 
     // Extract the JSON from the response
@@ -182,7 +182,7 @@ async function savePositionsToDatabase(
         organization_name: positions.organizationName,
         ein: positions.ein,
         positions: positions.positions,
-        fetched_at: new Date().toISOString()
+        fetched_at: new Date().toISOString(),
       })
     
     if (error) {

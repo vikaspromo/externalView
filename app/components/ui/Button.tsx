@@ -27,13 +27,13 @@ export const Button: React.FC<ButtonProps> = ({
   const variantClasses = {
     primary: 'text-white bg-primary-600 hover:bg-primary-700 focus:ring-primary-500',
     secondary: 'text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 focus:ring-primary-500',
-    danger: 'text-white bg-red-600 hover:bg-red-700 focus:ring-red-500'
+    danger: 'text-white bg-red-600 hover:bg-red-700 focus:ring-red-500',
   }
   
   const sizeClasses = {
     small: 'px-3 py-1.5 text-sm',
     medium: 'px-4 py-2 text-sm',
-    large: 'px-6 py-3 text-base'
+    large: 'px-6 py-3 text-base',
   }
   
   const widthClass = fullWidth ? 'w-full' : ''

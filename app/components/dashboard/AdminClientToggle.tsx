@@ -14,7 +14,7 @@ export function AdminClientToggle({
   clients, 
   selectedClientUuid, 
   selectedClient, 
-  onClientChange 
+  onClientChange, 
 }: AdminClientToggleProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 

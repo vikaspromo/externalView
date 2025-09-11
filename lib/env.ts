@@ -111,5 +111,5 @@ export const env = new Proxy({} as EnvConfig, {
   get(target, prop: string) {
     const config = getEnv()
     return config[prop as keyof EnvConfig]
-  }
+  },
 })

@@ -46,6 +46,6 @@ export const useClients = (): ClientsState => {
     selectedClientUuid,
     selectedClient,
     setSelectedClientUuid,
-    loadClients
+    loadClients,
   }
 }

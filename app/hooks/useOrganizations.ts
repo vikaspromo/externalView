@@ -55,7 +55,7 @@ export const useOrganizations = (): OrganizationsState => {
           owner: rel.relationship_owner || '',
           renewal_date: rel.renewal_date || '',
           created_at: '',
-          updated_at: ''
+          updated_at: '',
         })) || []
         setOrganizations(transformedOrgs)
       }
@@ -85,24 +85,24 @@ export const useOrganizations = (): OrganizationsState => {
         console.error('Error fetching organization details:', historyError)
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: null
+          [orgId]: null,
         }))
       } else {
         // Combine history data with positions
         const combinedData = {
           ...(historyData as ClientOrganizationHistory),
-          positions: positionsData?.positions || []
+          positions: positionsData?.positions || [],
         }
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: combinedData
+          [orgId]: combinedData,
         }))
       }
     } catch (error) {
       console.error('Unexpected error in fetchOrgDetails:', error)
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: null
+        [orgId]: null,
       }))
     }
   }, [supabase])
@@ -127,6 +127,6 @@ export const useOrganizations = (): OrganizationsState => {
     expandedRows,
     loadOrganizations,
     fetchOrgDetails,
-    toggleRowExpansion
+    toggleRowExpansion,
   }
 }
