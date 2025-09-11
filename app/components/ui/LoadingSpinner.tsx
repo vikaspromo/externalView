@@ -11,12 +11,12 @@ interface LoadingSpinnerProps {
 
 export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
   size = 'medium',
-  color = 'primary-600' 
+  color = 'primary-600', 
 }) => {
   const sizeClasses = {
     small: 'h-8 w-8',
     medium: 'h-12 w-12',
-    large: 'h-16 w-16'
+    large: 'h-16 w-16',
   }
 
   return (

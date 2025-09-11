@@ -1,9 +1,8 @@
 import { supabase } from '../shared/database'
 import { delay, API_DELAYS } from '../shared/rate-limiter'
 import { 
-  ProPublicaOrganization, 
   ProPublicaSearchResponse, 
-  PROPUBLICA_CONFIG 
+  PROPUBLICA_CONFIG, 
 } from './types'
 
 // Interface for our database organization
@@ -47,34 +46,34 @@ async function processOrganization(org: Organization): Promise<void> {
   
   // Handle API error
   if (!apiResponse) {
-    console.log(`  ❌ API Error - Marking as not found`)
+    console.log('  ❌ API Error - Marking as not found')
     const { error } = await supabase
       .from('organizations')
       .update({ 
         ein: PROPUBLICA_CONFIG.NO_RESULTS_EIN,
-        ein_related: []
+        ein_related: [],
       })
       .eq('uuid', org.uuid)
     
     if (error) {
-      console.error(`  Error updating organization:`, error)
+      console.error('  Error updating organization:', error)
     }
     return
   }
   
   // Handle no results
   if (apiResponse.total_results === 0) {
-    console.log(`  ⚠️ No results found - Marking with placeholder EIN`)
+    console.log('  ⚠️ No results found - Marking with placeholder EIN')
     const { error } = await supabase
       .from('organizations')
       .update({ 
         ein: PROPUBLICA_CONFIG.NO_RESULTS_EIN,
-        ein_related: []
+        ein_related: [],
       })
       .eq('uuid', org.uuid)
     
     if (error) {
-      console.error(`  Error updating organization:`, error)
+      console.error('  Error updating organization:', error)
     }
     return
   }
@@ -88,6 +87,10 @@ async function processOrganization(org: Organization): Promise<void> {
   // Handle single match
   if (topMatches.length === 1) {
     const match = topMatches[0]
+    if (!match) {
+      console.log('  ⚠️ No valid match found')
+      return
+    }
     console.log(`  ✅ Single match: ${match.name} (EIN: ${match.strein})`)
     
     const { error } = await supabase
@@ -95,18 +98,18 @@ async function processOrganization(org: Organization): Promise<void> {
       .update({ 
         name: match.name,
         ein: match.strein,
-        ein_related: []
+        ein_related: [],
       })
       .eq('uuid', org.uuid)
     
     if (error) {
-      console.error(`  Error updating organization:`, error)
+      console.error('  Error updating organization:', error)
     }
     return
   }
   
   // Handle multiple matches - group by normalized name
-  console.log(`  📝 Multiple matches with same score:`)
+  console.log('  📝 Multiple matches with same score:')
   
   // Group matches by normalized (lowercase) name
   const groupedByName = new Map<string, typeof topMatches>()
@@ -125,10 +128,15 @@ async function processOrganization(org: Organization): Promise<void> {
   const nameGroups = Array.from(groupedByName.entries())
   
   for (let i = 0; i < nameGroups.length; i++) {
-    const [, matches] = nameGroups[i]
+    const nameGroup = nameGroups[i]
+    if (!nameGroup) continue
+    
+    const [, matches] = nameGroup
     
     // Use the first match's exact name (with original capitalization)
     const primaryMatch = matches[0]
+    if (!primaryMatch) continue
+    
     const groupEins = matches.map(m => m.strein)
     
     if (i === 0) {
@@ -140,12 +148,12 @@ async function processOrganization(org: Organization): Promise<void> {
         .update({ 
           name: primaryMatch.name,
           ein: primaryMatch.strein,
-          ein_related: groupEins.filter(e => e !== primaryMatch.strein)
+          ein_related: groupEins.filter(e => e !== primaryMatch.strein),
         })
         .eq('uuid', org.uuid)
       
       if (updateError) {
-        console.error(`  Error updating organization:`, updateError)
+        console.error('  Error updating organization:', updateError)
       }
     } else {
       // Insert new record for different name groups
@@ -156,11 +164,11 @@ async function processOrganization(org: Organization): Promise<void> {
         .insert({
           name: primaryMatch.name,
           ein: primaryMatch.strein,
-          ein_related: groupEins.filter(e => e !== primaryMatch.strein)
+          ein_related: groupEins.filter(e => e !== primaryMatch.strein),
         })
       
       if (insertError) {
-        console.error(`  Error inserting new organization:`, insertError)
+        console.error('  Error inserting new organization:', insertError)
       }
     }
   }

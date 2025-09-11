@@ -22,7 +22,7 @@ export function EditableText({
   className = '',
   multiline = false,
   disabled = false,
-  label
+  label,
 }: EditableTextProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editValue, setEditValue] = useState(value)
@@ -64,6 +64,7 @@ export function EditableText({
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEditing, editValue])
 
   const handleSave = async () => {

@@ -14,7 +14,7 @@ interface ClientSelectorProps {
 export const ClientSelector: React.FC<ClientSelectorProps> = ({ 
   clients, 
   selectedClientUuid, 
-  onClientChange 
+  onClientChange, 
 }) => {
   if (clients.length === 0) {
     return null

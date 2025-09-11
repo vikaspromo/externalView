@@ -15,11 +15,12 @@ export default function HomePage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (session?.user) {
         setUser(session.user)
+        // CRITICAL FIX: Use auth.uid() instead of email to prevent JWT spoofing
         // Check if user is in users table
         const { data: allowedUser } = await supabase
           .from('users')
           .select('*')
-          .eq('email', session.user.email)
+          .eq('id', session.user.id)  // Use uid, not email!
           .single()
         
         if (allowedUser) {
@@ -31,7 +32,7 @@ export default function HomePage() {
         const { data: adminUser } = await supabase
           .from('user_admins')
           .select('*')
-          .eq('email', session.user.email)
+          .eq('user_id', session.user.id)  // Use uid for admin check too!
           .eq('active', true)
           .single()
         

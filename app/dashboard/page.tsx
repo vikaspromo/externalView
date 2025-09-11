@@ -5,9 +5,10 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 import { SortField, SortDirection } from '@/lib/types/dashboard'
-import { formatCurrency, formatDate, formatFieldValue } from '@/app/utils/formatters'
+import { formatCurrency, formatDate } from '@/app/utils/formatters'
 import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
+import { Pagination } from '@/app/components/ui/Pagination'
 
 
 
@@ -26,6 +27,8 @@ export default function DashboardPage() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [orgDetails, setOrgDetails] = useState<Record<string, (ClientOrganizationHistory & { positions?: any[] }) | null>>({})
+  const [currentPage, setCurrentPage] = useState(1)
+  const [itemsPerPage] = useState(100) // Limit to 100 items per page
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -41,11 +44,12 @@ export default function DashboardPage() {
 
         setUser(session.user)
         
+        // CRITICAL FIX: Use auth.uid() instead of email to prevent JWT spoofing
         // Check if user is an admin first
         const { data: adminData, error: adminError } = await supabase
           .from('user_admins')
-          .select('email, active')
-          .eq('email', session.user.email)
+          .select('user_id, active')
+          .eq('user_id', session.user.id)  // Use uid, not email!
           .eq('active', true)
           .single()
         
@@ -81,7 +85,7 @@ export default function DashboardPage() {
             client_uuid: '', // No default client for admins
             active: true,
             created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
           }
           setUserData(minimalUserData as any)
         }
@@ -122,8 +126,11 @@ export default function DashboardPage() {
             }
           } else if (isAdminUser && clientsData && clientsData.length > 0) {
             // For admins without a default client, select the first available client
-            setSelectedClientUuid(clientsData[0].uuid)
-            setSelectedClient(clientsData[0])
+            const firstClient = clientsData[0]
+            if (firstClient) {
+              setSelectedClientUuid(firstClient.uuid)
+              setSelectedClient(firstClient)
+            }
           }
         }
       } catch (error) {
@@ -169,7 +176,7 @@ export default function DashboardPage() {
           owner: rel.relationship_owner || '',
           renewal_date: rel.renewal_date || '',
           created_at: '',
-          updated_at: ''
+          updated_at: '',
         })) || []
         setOrganizations(transformedOrgs)
       }
@@ -218,6 +225,15 @@ export default function DashboardPage() {
     return sorted
   }, [organizations, sortField, sortDirection])
 
+  // Paginated organizations
+  const paginatedOrganizations = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return sortedOrganizations.slice(startIndex, endIndex)
+  }, [sortedOrganizations, currentPage, itemsPerPage])
+
+  const totalPages = Math.ceil(sortedOrganizations.length / itemsPerPage)
+
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       // Toggle direction if clicking the same field
@@ -227,6 +243,14 @@ export default function DashboardPage() {
       setSortField(field)
       setSortDirection('desc')
     }
+    // Reset to first page when sorting changes
+    setCurrentPage(1)
+  }
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top of table
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const toggleRowExpansion = async (orgId: string) => {
@@ -259,7 +283,7 @@ export default function DashboardPage() {
       // Update local state
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null
+        [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null,
       }))
     } catch (error) {
       console.error('Error updating notes:', error)
@@ -278,7 +302,7 @@ export default function DashboardPage() {
         .maybeSingle()
       
       // Fetch organization positions
-      const { data: positionsData, error: positionsError } = await supabase
+      const { data: positionsData } = await supabase
         .from('org_positions')
         .select('positions')
         .eq('organization_uuid', orgId)
@@ -288,24 +312,24 @@ export default function DashboardPage() {
         console.error('Error fetching organization details:', historyError)
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: null
+          [orgId]: null,
         }))
       } else {
         // Combine history data with positions
         const combinedData = {
           ...(historyData as ClientOrganizationHistory),
-          positions: positionsData?.positions || []
+          positions: positionsData?.positions || [],
         }
         setOrgDetails(prev => ({
           ...prev,
-          [orgId]: combinedData
+          [orgId]: combinedData,
         }))
       }
     } catch (error) {
       console.error('Unexpected error in fetchOrgDetails:', error)
       setOrgDetails(prev => ({
         ...prev,
-        [orgId]: null
+        [orgId]: null,
       }))
     }
   }  // End of fetchOrgDetails function
@@ -342,6 +366,7 @@ export default function DashboardPage() {
                   onClientChange={(client) => {
                     setSelectedClientUuid(client.uuid)
                     setSelectedClient(client)
+                    setCurrentPage(1) // Reset pagination when changing clients
                   }}
                 />
               )}
@@ -485,7 +510,7 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {sortedOrganizations.map((org) => (
+                    {paginatedOrganizations.map((org) => (
                       <React.Fragment key={org.id}>
                         <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => toggleRowExpansion(org.id)}>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -581,9 +606,9 @@ export default function DashboardPage() {
                                           const order: { [key: string]: number } = {
                                             'In favor': 1,
                                             'Opposed': 2,
-                                            'No position': 3
-                                          };
-                                          return (order[a.position] || 999) - (order[b.position] || 999);
+                                            'No position': 3,
+                                          }
+                                          return (order[a.position] || 999) - (order[b.position] || 999)
                                         }).map((position: any, index: number) => (
                                           <div key={index} className="border border-gray-200 rounded-lg p-4">
                                             {/* Position Header */}
@@ -649,6 +674,16 @@ export default function DashboardPage() {
                     ))}
                   </tbody>
                 </table>
+                {/* Pagination */}
+                {sortedOrganizations.length > itemsPerPage && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalItems={sortedOrganizations.length}
+                    itemsPerPage={itemsPerPage}
+                    onPageChange={handlePageChange}
+                  />
+                )}
               </div>
             ) : (
               <div className="text-center py-12">

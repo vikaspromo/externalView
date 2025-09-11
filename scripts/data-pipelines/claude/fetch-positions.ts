@@ -1,6 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
 import { supabase } from '../shared/database'
-import { PROPUBLICA_CONFIG } from '../propublica/types'
 
 // Interface for position data structure
 interface Position {
@@ -97,14 +96,14 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
       messages: [
         {
           role: 'user',
-          content: buildPrompt(orgName, ein)
-        }
-      ]
+          content: buildPrompt(orgName, ein),
+        },
+      ],
     })
 
     // Extract the JSON from the response
-    const content = message.content[0]
-    if (content.type !== 'text') {
+    const content = message.content && message.content[0]
+    if (!content || !('type' in content) || content.type !== 'text') {
       console.error('Unexpected response type from Claude')
       return null
     }
@@ -112,6 +111,11 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
     // Parse the JSON response
     const jsonMatch = content.text.match(/```json\n([\s\S]*?)\n```/)
     const jsonStr = jsonMatch ? jsonMatch[1] : content.text
+    
+    if (!jsonStr) {
+      console.error('No JSON string to parse')
+      return null
+    }
     
     try {
       const data = JSON.parse(jsonStr) as PositionsResponse
@@ -182,7 +186,7 @@ async function savePositionsToDatabase(
         organization_name: positions.organizationName,
         ein: positions.ein,
         positions: positions.positions,
-        fetched_at: new Date().toISOString()
+        fetched_at: new Date().toISOString(),
       })
     
     if (error) {
@@ -230,6 +234,10 @@ async function main() {
   // Process each organization
   for (let i = 0; i < organizations.length; i++) {
     const org = organizations[i]
+    if (!org) {
+      console.log(`Skipping index ${i}: organization is undefined`)
+      continue
+    }
     console.log('='.repeat(80))
     console.log(`Processing ${i + 1} of ${organizations.length}: ${org.name}`)
     console.log(`EIN: ${org.ein || 'No EIN'}`)
