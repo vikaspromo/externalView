@@ -112,6 +112,11 @@ async function fetchPositionsFromClaude(orgName: string, ein: string): Promise<P
     const jsonMatch = content.text.match(/```json\n([\s\S]*?)\n```/)
     const jsonStr = jsonMatch ? jsonMatch[1] : content.text
     
+    if (!jsonStr) {
+      console.error('No JSON string to parse')
+      return null
+    }
+    
     try {
       const data = JSON.parse(jsonStr) as PositionsResponse
       return data
