@@ -49,6 +49,29 @@ add_user_table.sql                          ❌ (no timestamp)
 - Prevents naming conflicts when multiple changes happen same day
 - Makes rollbacks easier to identify and execute
 
+## Code Quality Checks
+
+### IMPORTANT: Always run checks before committing
+**You MUST run the following checks before committing any code changes:**
+
+```bash
+# Run all checks at once (recommended)
+npm run check:all
+
+# Or run individually:
+npm run lint        # Check for ESLint errors
+npm run typecheck   # Check for TypeScript type errors
+```
+
+### Automated Pre-commit Hooks
+The project has Husky pre-commit hooks that automatically run these checks before each commit. If any check fails, the commit will be blocked until the issues are fixed.
+
+### Common Issues to Watch For:
+1. **Trailing commas** - ESLint requires trailing commas in objects and arrays
+2. **Undefined objects** - TypeScript requires null checks before accessing properties
+3. **Unused parameters** - Prefix with underscore (e.g., `_param`) if intentionally unused
+4. **Console statements** - Use the logger utility instead of console.log/error
+
 ## Other Project Conventions
 
 ### Testing
