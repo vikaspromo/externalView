@@ -2,6 +2,558 @@
 
 **GitHub Repository:** https://github.com/vikaspromo/externalView_0.2
 
+## GitHub Codespaces Setup Instructions
+
+### Repository Settings for Optimal Codespaces Experience
+
+#### 1. Enable Codespaces
+1. Go to your repository settings: https://github.com/vikaspromo/externalView_0.2/settings
+2. Navigate to **Settings → General → Features**
+3. Ensure **Codespaces** is enabled
+
+#### 2. Configure Codespaces Settings
+Go to **Settings → Codespaces** and configure:
+
+**Machine Type:**
+- Set default to **4-core, 8GB RAM** (optimal for Next.js + Supabase)
+- Allow up to **8-core, 16GB RAM** for heavier workloads
+
+**Prebuild Configuration:**
+- Enable **Prebuilds** for faster startup
+- Set triggers: Every push to `main` and `dev` branches
+- Region: Choose closest to you
+
+**Retention:**
+- Inactive prebuild retention: 7 days
+- Inactive codespace retention: 30 days
+
+#### 3. Create Dev Container Configuration
+Create `.devcontainer/devcontainer.json` in your repo:
+
+```json
+{
+  "name": "ExternalView Dev Environment",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "bradlc.vscode-tailwindcss",
+        "ms-azuretools.vscode-docker",
+        "GitHub.copilot",
+        "eamodio.gitlens"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        }
+      }
+    }
+  },
+  
+  "postCreateCommand": "npm install && npx supabase start",
+  "postStartCommand": "npx supabase status",
+  
+  "forwardPorts": [
+    3000,    // Next.js
+    54321,   // Supabase API
+    54322,   // Supabase DB
+    54323,   // Supabase Studio
+    54324,   // Inbucket
+    54327    // Supabase Analytics
+  ],
+  
+  "portsAttributes": {
+    "3000": { "label": "Next.js App", "onAutoForward": "openBrowser" },
+    "54321": { "label": "Supabase API", "onAutoForward": "notify" },
+    "54323": { "label": "Supabase Studio", "onAutoForward": "openBrowser" }
+  },
+  
+  "remoteEnv": {
+    "NEXT_PUBLIC_APP_URL": "https://${CODESPACE_NAME}-3000.${GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}"
+  }
+}
+```
+
+#### 4. Add Codespaces Secrets
+Go to **Settings → Secrets and variables → Codespaces** and add:
+
+```
+ANTHROPIC_API_KEY          # Your Claude API key
+SUPABASE_SERVICE_KEY        # Your Supabase service key (if using cloud)
+NEXT_PUBLIC_SUPABASE_URL    # Your Supabase URL (if using cloud)
+NEXT_PUBLIC_SUPABASE_ANON_KEY # Your Supabase anon key (if using cloud)
+```
+
+#### 5. Create Initialization Script
+Create `.devcontainer/postCreateCommand.sh`:
+
+```bash
+#!/bin/bash
+
+# Install dependencies
+npm install
+
+# Set up git
+git config --global user.email "your-email@example.com"
+git config --global user.name "Your Name"
+
+# Initialize Supabase
+npx supabase init
+
+# Start Supabase in background
+npx supabase start &
+
+# Create .env.local from example if it doesn't exist
+if [ ! -f .env.local ]; then
+  cp .env.example .env.local
+  echo "✅ Created .env.local from .env.example"
+fi
+
+# Wait for Supabase to be ready
+echo "⏳ Waiting for Supabase to start..."
+sleep 30
+
+# Run migrations
+npx supabase db reset
+
+echo "✅ Codespace setup complete!"
+echo "📝 Next steps:"
+echo "  1. Update .env.local with your API keys"
+echo "  2. Run 'npm run dev' to start the development server"
+```
+
+#### 6. Add Quick Start Badge to README
+Add to your README.md:
+
+```markdown
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/vikaspromo/externalView_0.2?quickstart=1)
+```
+
+#### 7. Repository Secrets for Actions
+Go to **Settings → Secrets and variables → Actions** and add:
+
+```
+VERCEL_TOKEN               # For auto-deployment
+VERCEL_ORG_ID             # Your Vercel org ID
+VERCEL_PROJECT_ID         # Your Vercel project ID
+```
+
+#### 8. Branch Protection Rules
+Go to **Settings → Branches** and add rule for `main`:
+
+- Require pull request reviews: ✅
+- Dismiss stale reviews: ✅
+- Require status checks: ✅
+  - ESLint
+  - TypeScript
+  - Build
+- Include administrators: ❌ (so you can emergency push)
+- Allow force pushes: ❌
+
+#### 9. GitHub Actions Workflow
+Create `.github/workflows/ci.yml`:
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main]
+
+jobs:
+  lint-and-type-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint
+      
+      - name: Run TypeScript Check
+        run: npm run typecheck
+      
+      - name: Run Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+```
+
+#### 10. CLI Tools Setup
+
+**Install and Configure Essential CLIs:**
+
+##### GitHub CLI (gh)
+```bash
+# Install (if not in Codespace)
+brew install gh  # macOS
+# or
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+sudo apt update && sudo apt install gh  # Linux
+
+# Authenticate
+gh auth login
+
+# Common commands for this project
+gh repo clone vikaspromo/externalView_0.2
+gh pr create --title "feat: Add feature" --body "Description"
+gh pr list
+gh pr merge
+gh issue create --title "Bug: Something broken"
+gh codespace create --repo vikaspromo/externalView_0.2
+gh codespace list
+gh codespace ssh
+```
+
+##### Claude Code CLI
+```bash
+# Install Claude Code globally
+npm install -g @anthropic/claude-code
+
+# Or use directly with npx
+npx claude-code
+
+# Initialize in project
+claude-code init
+
+# Configure with your API key
+export ANTHROPIC_API_KEY="your-key-here"
+
+# Common commands
+claude-code chat "Help me implement user authentication"
+claude-code review "Review this PR for security issues"
+claude-code explain "Explain the RLS policies in this codebase"
+```
+
+##### Supabase CLI
+```bash
+# Install (usually via npm in project)
+npm install --save-dev supabase
+
+# Or install globally
+npm install -g supabase
+
+# Login to Supabase
+npx supabase login
+
+# Initialize project
+npx supabase init
+
+# Link to cloud project
+npx supabase link --project-ref your-project-ref
+
+# Common commands for development
+npx supabase start          # Start local Supabase
+npx supabase stop           # Stop local Supabase
+npx supabase status         # Check status and get URLs
+npx supabase db reset       # Reset database with seed data
+npx supabase db push        # Push local schema to cloud
+npx supabase db pull        # Pull cloud schema to local
+npx supabase migration new feature_name  # Create new migration
+npx supabase gen types typescript --local > lib/database.types.ts  # Generate TypeScript types
+```
+
+##### Vercel CLI
+```bash
+# Install globally
+npm install -g vercel
+
+# Or use with npx
+npx vercel
+
+# Login
+vercel login
+
+# Link project
+vercel link
+
+# Common commands
+vercel dev          # Run development server with Vercel environment
+vercel             # Deploy to preview
+vercel --prod      # Deploy to production
+vercel env ls      # List environment variables
+vercel env add     # Add environment variable
+vercel logs        # View function logs
+vercel domains     # Manage domains
+vercel alias       # Manage aliases
+```
+
+##### Complete Codespaces CLI Setup
+
+**Step 1: Full Dev Container Configuration**
+Create `.devcontainer/devcontainer.json` with all CLIs:
+
+```json
+{
+  "name": "ExternalView Development",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20"
+    }
+  },
+  
+  "postCreateCommand": ".devcontainer/setup.sh",
+  
+  "containerEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}",
+    "VERCEL_TOKEN": "${localEnv:VERCEL_TOKEN}",
+    "GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+  },
+  
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "GitHub.copilot"
+      ]
+    }
+  },
+  
+  "forwardPorts": [3000, 54321, 54322, 54323]
+}
+```
+
+**Step 2: Create Setup Script**
+Create `.devcontainer/setup.sh`:
+
+```bash
+#!/bin/bash
+set -e
+
+echo "🚀 Setting up ExternalView Codespace..."
+
+# Install global CLIs
+echo "📦 Installing CLI tools..."
+npm install -g supabase vercel pnpm
+
+# Install Claude Code CLI (when available)
+# npm install -g @anthropic/claude-code
+
+# Install project dependencies
+echo "📦 Installing project dependencies..."
+pnpm install
+
+# Configure GitHub CLI
+echo "🔧 Configuring GitHub CLI..."
+if [ -n "$GITHUB_TOKEN" ]; then
+  echo $GITHUB_TOKEN | gh auth login --with-token
+  gh auth setup-git
+fi
+
+# Configure Vercel CLI
+echo "🔧 Configuring Vercel CLI..."
+if [ -n "$VERCEL_TOKEN" ]; then
+  mkdir -p ~/.config/vercel
+  echo "{\"token\":\"$VERCEL_TOKEN\"}" > ~/.config/vercel/auth.json
+fi
+
+# Initialize Supabase
+echo "🔧 Setting up Supabase..."
+if [ ! -d "supabase" ]; then
+  npx supabase init
+fi
+
+# Start Supabase in background
+echo "🚀 Starting Supabase..."
+npx supabase start &
+
+# Create .env.local if it doesn't exist
+if [ ! -f .env.local ]; then
+  cp .env.example .env.local
+  echo "✅ Created .env.local from .env.example"
+fi
+
+# Wait for Supabase to be ready
+echo "⏳ Waiting for Supabase to start (this may take a few minutes)..."
+sleep 45
+
+# Get Supabase URLs and keys
+SUPABASE_STATUS=$(npx supabase status --output json 2>/dev/null || echo "{}")
+if [ "$SUPABASE_STATUS" != "{}" ]; then
+  API_URL=$(echo $SUPABASE_STATUS | jq -r '.API_URL // empty')
+  ANON_KEY=$(echo $SUPABASE_STATUS | jq -r '.ANON_KEY // empty')
+  SERVICE_KEY=$(echo $SUPABASE_STATUS | jq -r '.SERVICE_ROLE_KEY // empty')
+  
+  if [ -n "$API_URL" ]; then
+    sed -i "s|NEXT_PUBLIC_SUPABASE_URL=.*|NEXT_PUBLIC_SUPABASE_URL=$API_URL|" .env.local
+    sed -i "s|NEXT_PUBLIC_SUPABASE_ANON_KEY=.*|NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY|" .env.local
+    sed -i "s|SUPABASE_SERVICE_KEY=.*|SUPABASE_SERVICE_KEY=$SERVICE_KEY|" .env.local
+    echo "✅ Updated .env.local with Supabase credentials"
+  fi
+fi
+
+# Set up git
+git config --global user.email "${GITHUB_USER}@users.noreply.github.com"
+git config --global user.name "${GITHUB_USER}"
+
+echo "✅ Codespace setup complete!"
+echo ""
+echo "📝 Quick Start Commands:"
+echo "  pnpm dev              - Start Next.js development server"
+echo "  npx supabase status   - Check Supabase status"
+echo "  gh pr create          - Create a pull request"
+echo "  vercel               - Deploy to Vercel"
+echo ""
+echo "🔑 Don't forget to add your API keys to .env.local!"
+```
+
+**Step 3: Add Codespace Secrets**
+Go to your GitHub settings → Codespaces → Secrets and add:
+
+```
+ANTHROPIC_API_KEY=sk-ant-xxxxx
+VERCEL_TOKEN=xxxxx
+GITHUB_TOKEN=ghp_xxxxx (auto-provided in Codespaces)
+```
+
+**Step 4: Create CLI Aliases**
+Create `.devcontainer/cli-aliases.sh`:
+
+```bash
+#!/bin/bash
+
+# Supabase shortcuts
+alias sb='npx supabase'
+alias sbstart='npx supabase start'
+alias sbstop='npx supabase stop'
+alias sbstatus='npx supabase status'
+alias sbreset='npx supabase db reset'
+alias sbmigrate='npx supabase migration new'
+alias sbtypes='npx supabase gen types typescript --local > lib/database.types.ts'
+
+# Vercel shortcuts
+alias v='vercel'
+alias vdev='vercel dev'
+alias vdeploy='vercel --prod'
+alias venv='vercel env'
+alias vlogs='vercel logs --follow'
+
+# GitHub CLI shortcuts
+alias gpr='gh pr create'
+alias gprs='gh pr status'
+alias gprv='gh pr view --web'
+alias gissue='gh issue create'
+alias gcs='gh codespace'
+
+# Claude Code shortcuts (when available)
+alias claude='npx claude-code'
+alias crev='npx claude-code review'
+alias cexplain='npx claude-code explain'
+
+# Project shortcuts
+alias dev='pnpm dev'
+alias build='pnpm build'
+alias lint='pnpm lint'
+alias typecheck='pnpm typecheck'
+alias test='pnpm test'
+
+# Database shortcuts
+alias dbstudio='open http://localhost:54323'
+alias dbreset='npx supabase db reset'
+alias dbseed='npx supabase db seed'
+
+echo "✅ CLI aliases loaded! Type 'alias' to see all available shortcuts."
+```
+
+**Step 5: Add to Shell Profile**
+Add to `.devcontainer/postStartCommand.sh`:
+
+```bash
+#!/bin/bash
+
+# Source CLI aliases
+if [ -f .devcontainer/cli-aliases.sh ]; then
+  source .devcontainer/cli-aliases.sh
+fi
+
+# Show status
+echo "🎉 Codespace Ready!"
+echo ""
+npx supabase status
+echo ""
+echo "Quick commands: dev | sbstatus | gpr | vdeploy"
+```
+
+##### CLI Configuration Files
+
+Create `.github/cli.yml` for GitHub CLI config:
+```yaml
+# What protocol to use when performing git operations
+git_protocol: https
+# What editor gh should run when creating issues, PRs, etc.
+editor: code --wait
+# Aliases for common commands
+aliases:
+  co: pr checkout
+  pv: pr view --web
+  iv: issue view --web
+```
+
+Create `vercel.json` for Vercel config:
+```json
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_SUPABASE_URL": "@supabase-url",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase-anon-key"
+  }
+}
+```
+
+#### 11. Codespaces Performance Tips
+
+**Optimize for Codespaces:**
+- Use **pnpm** instead of npm for faster installs
+- Enable **Turbopack** in Next.js for faster builds
+- Use **SWR** or **React Query** for client-side caching
+- Minimize Docker layers in dev container
+
+**Resource Management:**
+- Stop Codespaces when not in use (auto-stops after 30 min)
+- Delete old Codespaces regularly
+- Use prebuilds for common branches
+
+**Development Workflow:**
+1. Create Codespace from main branch
+2. Create feature branch in Codespace
+3. Develop and test
+4. Push and create PR
+5. Codespace automatically deleted after merge
+
 ## Project Context
 
 ExternalView is a **multi-tenant stakeholder intelligence platform** that helps organizations track and analyze policy positions. This plan prioritizes:
