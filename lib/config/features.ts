@@ -24,5 +24,6 @@ export const USE_SIMPLIFIED_RLS = process.env.NEXT_PUBLIC_USE_SIMPLIFIED_RLS ===
 
 // Log the current mode in development
 if (process.env.NODE_ENV === 'development') {
+  // eslint-disable-next-line no-console
   console.log(`[Feature Flags] RLS Mode: ${USE_SIMPLIFIED_RLS ? 'Simplified (v2)' : 'Legacy (current)'}`)
 }
