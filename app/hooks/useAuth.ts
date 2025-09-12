@@ -1,5 +1,5 @@
 /**
- * Custom hook for authentication logic
+ * Fixed auth hook that handles logout errors with new API keys
  */
 
 import { useEffect, useState } from 'react'
@@ -14,9 +14,6 @@ export interface AuthState {
   signOut: () => Promise<void>
 }
 
-/**
- * Hook to manage authentication state and user data
- */
 export const useAuth = (): AuthState => {
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<User | null>(null)
@@ -36,12 +33,11 @@ export const useAuth = (): AuthState => {
 
         setUser(session.user)
         
-        // CRITICAL FIX: Use auth.uid() instead of email to prevent JWT spoofing
-        // Check if user is in users table (allowed users)
+        // Check if user is in users table
         const { data: allowedUser } = await supabase
           .from('users')
           .select('*')
-          .eq('id', session.user.id)  // Use uid, not email!
+          .eq('id', session.user.id)
           .single()
         
         if (allowedUser) {
@@ -49,22 +45,21 @@ export const useAuth = (): AuthState => {
           return
         }
         
-        // If not in users table, check if they're an admin
+        // Check if they're an admin
         const { data: adminUser } = await supabase
           .from('user_admins')
           .select('*')
-          .eq('user_id', session.user.id)  // Use uid for admin check too!
+          .eq('user_id', session.user.id)
           .eq('active', true)
           .single()
         
         if (adminUser) {
-          // Create minimal user data for admin
           const minimalUserData: User = {
             id: session.user.id,
-            email: session.user.email!,  // Email is only used for display, not auth
+            email: session.user.email!,
             first_name: null,
             last_name: null,
-            client_uuid: '', // Admins don't have a default client
+            client_uuid: '',
             active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -73,9 +68,8 @@ export const useAuth = (): AuthState => {
           return
         }
         
-        // User not authorized in either table
-        await supabase.auth.signOut()
-        router.push('/')
+        // User not authorized
+        await signOut()
         return
       } catch (error) {
         console.error('Auth error:', error)
@@ -89,8 +83,24 @@ export const useAuth = (): AuthState => {
   }, [supabase, router])
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
+    try {
+      // Try to sign out normally
+      await supabase.auth.signOut()
+    } catch (error) {
+      // If logout fails (403 with new keys), clear local session anyway
+      console.warn('Logout error (expected with new API keys):', error)
+      
+      // Clear local storage to force re-authentication
+      if (typeof window !== 'undefined') {
+        // Clear Supabase auth storage
+        const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`
+        localStorage.removeItem(storageKey)
+        sessionStorage.clear()
+      }
+    } finally {
+      // Always redirect to home
+      router.push('/')
+    }
   }
 
   return {
