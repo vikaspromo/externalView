@@ -166,7 +166,7 @@ export async function getAuditSummary(
         totalEvents: 0,
         accessDenied: 0,
         unauthorizedAttempts: 0,
-        recentEvents: []
+        recentEvents: [],
       }
     }
     

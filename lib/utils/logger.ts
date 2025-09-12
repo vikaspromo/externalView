@@ -129,6 +129,7 @@ const seen = new WeakSet()
  * Development-only logger for debugging
  * This will be completely removed in production builds
  */
+/* eslint-disable no-console */
 export const devLog = isDevelopment ? {
   log: console.log,
   error: console.error,
@@ -148,5 +149,6 @@ export const devLog = isDevelopment ? {
   time: () => {},
   timeEnd: () => {},
 }
+/* eslint-enable no-console */
 
 export default logger
