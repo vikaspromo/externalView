@@ -28,15 +28,33 @@ npm install -D @types/node
 npx supabase init
 ```
 
-**.env.local (single config file):**
-```env
-# Supabase (local or cloud)
-NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_KEY=your-service-key
+**GitHub Secrets Setup (no exposed keys):**
 
-# APIs
-ANTHROPIC_API_KEY=your-claude-key
+1. Go to your repository: https://github.com/vikaspromo/externalView_0.2
+2. Settings → Secrets and variables → Actions
+3. Add these secrets:
+   - `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase URL
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Public anon key
+   - `SUPABASE_SERVICE_KEY` - Service key (keep secret!)
+   - `ANTHROPIC_API_KEY` - Claude API key (keep secret!)
+
+4. For Codespaces, also add to → Codespaces secrets:
+   - `SUPABASE_SERVICE_KEY`
+   - `ANTHROPIC_API_KEY`
+
+5. Create `.env.example` (safe to commit):
+```env
+# Example only - real values in GitHub Secrets
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGc...
+SUPABASE_SERVICE_KEY=eyJhbGc...
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+6. Add to `.gitignore`:
+```
+.env.local
+.env
 ```
 
 ### Day 2: Simple Database Schema

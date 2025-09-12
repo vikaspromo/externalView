@@ -105,12 +105,35 @@ Use this prompt with Claude Code to set up your new project:
    - getTenantId() helper
    - Wraps Supabase auth but can swap to Cognito later
 
-9. **Set up .env.local**:
+9. **Set up GitHub Secrets for secure key storage**:
+   
+   Go to GitHub repository settings → Secrets and variables → Actions:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL        # Your Supabase project URL
+   NEXT_PUBLIC_SUPABASE_ANON_KEY   # Public anon key (safe to expose)
+   SUPABASE_SERVICE_KEY            # Service role key (NEVER expose)
+   ANTHROPIC_API_KEY               # Claude API key (NEVER expose)
+   ```
+   
+   For Codespaces, also add to → Secrets and variables → Codespaces:
+   ```
+   SUPABASE_SERVICE_KEY
+   ANTHROPIC_API_KEY
+   ```
+   
+   Create `.env.example` (safe to commit):
    ```env
-   NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[from-supabase-status]
-   SUPABASE_SERVICE_KEY=[from-supabase-status]
-   ANTHROPIC_API_KEY=[my-claude-api-key]
+   # Copy this to .env.local for local development
+   # In production, these come from GitHub Secrets/Vercel env vars
+   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+   SUPABASE_SERVICE_KEY=your-service-key
+   ANTHROPIC_API_KEY=sk-ant-xxxxx
+   ```
+   
+   Add `.env.local` to `.gitignore`:
+   ```bash
+   echo ".env.local" >> .gitignore
    ```
 
 10. **Create a minimal dashboard** at `app/dashboard/page.tsx`:
@@ -146,6 +169,56 @@ The goal is to have a working prototype in 2 weeks that can be migrated to AWS b
 3. **SOC 2 foundation** with audit logging
 4. **Simple tenant isolation** without complexity
 5. **Standard SQL** that works anywhere
+
+## Using GitHub Secrets in Different Environments:
+
+### For Local Development:
+```bash
+# Create .env.local from example (NOT committed to git)
+cp .env.example .env.local
+# Then manually add your actual keys to .env.local
+```
+
+### For GitHub Codespaces:
+Secrets are automatically available as environment variables when you:
+1. Add them to Settings → Codespaces secrets
+2. Start a new Codespace
+
+```javascript
+// In your code, access them directly:
+process.env.ANTHROPIC_API_KEY  // Automatically injected
+process.env.SUPABASE_SERVICE_KEY  // Automatically injected
+```
+
+### For Vercel Deployment:
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Link project and add secrets
+vercel link
+vercel env add NEXT_PUBLIC_SUPABASE_URL
+vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY  
+vercel env add SUPABASE_SERVICE_KEY
+vercel env add ANTHROPIC_API_KEY
+```
+
+### For GitHub Actions CI/CD:
+```yaml
+# .github/workflows/deploy.yml
+env:
+  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+  SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+  ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+```
+
+### Security Best Practices:
+1. **NEVER commit** `.env.local` to git
+2. **ALWAYS use** GitHub Secrets for sensitive keys
+3. **Public keys** (like NEXT_PUBLIC_*) are safe in client code
+4. **Service keys** should ONLY be used server-side
+5. **Rotate keys** regularly and update in GitHub Secrets
 
 ## After Setup:
 
