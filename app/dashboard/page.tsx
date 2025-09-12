@@ -372,13 +372,22 @@ export default function DashboardPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Overall Alignment</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Portfolio Alignment</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {(() => {
-                    const orgsWithScores = organizations.filter(org => org.alignment_score != null)
+                    const orgsWithScores = organizations.filter(org => org.alignment_score != null && org.total_spend != null)
                     if (orgsWithScores.length === 0) return '-'
-                    const avgScore = orgsWithScores.reduce((sum, org) => sum + (org.alignment_score || 0), 0) / orgsWithScores.length
-                    return Math.round(avgScore) + '%'
+                    
+                    // Calculate dollar-weighted average
+                    const totalSpend = orgsWithScores.reduce((sum, org) => sum + (org.total_spend || 0), 0)
+                    if (totalSpend === 0) return '-'
+                    
+                    const weightedSum = orgsWithScores.reduce((sum, org) => {
+                      const weight = (org.total_spend || 0) / totalSpend
+                      return sum + ((org.alignment_score || 0) * weight)
+                    }, 0)
+                    
+                    return Math.round(weightedSum) + '%'
                   })()}
                 </p>
               </div>
