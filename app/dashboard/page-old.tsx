@@ -3,66 +3,109 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
-import { Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
+import { User, Organization, Client, ClientOrganizationHistory } from '@/lib/supabase/types'
 import { SortField, SortDirection } from '@/lib/types/dashboard'
 import { formatCurrency, formatDate } from '@/app/utils/formatters'
 import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
 import { Pagination } from '@/app/components/ui/Pagination'
-import { useAuth } from '@/app/hooks/useAuth'
+
+
+
+
 
 export default function DashboardPage() {
-  const { user, userData, isLoading: authLoading, isAdmin, signOut } = useAuth()
+  const [user, setUser] = useState<any>(null)
+  const [userData, setUserData] = useState<User | null>(null)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [clients, setClients] = useState<Client[]>([])
   const [selectedClientUuid, setSelectedClientUuid] = useState<string>('')
   const [selectedClient, setSelectedClient] = useState<Client | null>(null)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('name')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set())
   const [orgDetails, setOrgDetails] = useState<Record<string, (ClientOrganizationHistory & { positions?: any[] }) | null>>({})
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(100)
+  const [itemsPerPage] = useState(100) // Limit to 100 items per page
   const router = useRouter()
   const supabase = createClientComponentClient()
 
-  // Load clients based on user type
   useEffect(() => {
-    const loadClients = async () => {
-      if (!user || !userData) {
-        return
-      }
-
+    const getUser = async () => {
       try {
-        if (isAdmin) {
-          // Admin: Load all clients
-          const { data: clientsData, error: clientsError } = await supabase
-            .from('clients')
-            .select('uuid, name')
-            .order('name', { ascending: true })
-          
-          if (clientsError) {
-            console.error('Error fetching clients:', clientsError)
-          } else if (clientsData) {
-            setClients(clientsData)
-            
-            // Set initial client selection
-            if (userData.client_uuid) {
-              // Use user's default client if they have one
-              const userClient = clientsData.find(c => c.uuid === userData.client_uuid)
-              if (userClient) {
-                setSelectedClientUuid(userClient.uuid)
-                setSelectedClient(userClient)
-              }
-            } else if (clientsData.length > 0) {
-              // Otherwise use first client
-              setSelectedClientUuid(clientsData[0].uuid)
-              setSelectedClient(clientsData[0])
-            }
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session?.user) {
+          router.push('/')
+          return
+        }
+
+        setUser(session.user)
+        
+        // CRITICAL FIX: Use auth.uid() instead of email to prevent JWT spoofing
+        // Check if user is an admin first
+        const { data: adminData, error: adminError } = await supabase
+          .from('user_admins')
+          .select('user_id, active')
+          .eq('user_id', session.user.id)  // Use uid, not email!
+          .eq('active', true)
+          .single()
+        
+        const isAdminUser = !adminError && adminData
+        if (isAdminUser) {
+          setIsAdmin(true)
+        }
+        
+        // Get user details from users table using auth.uid()
+        const { data: userData } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .maybeSingle()
+        
+        if (!userData && !isAdminUser) {
+          // Not in users table and not an admin - deny access
+          router.push('/')
+          return
+        }
+        
+        if (userData) {
+          // Regular user - use their data
+          setUserData(userData)
+        } else if (isAdminUser) {
+          // Admin user not in users table - create minimal user object
+          // Admins will select a client to view after loading
+          const minimalUserData = {
+            id: session.user.id,
+            email: session.user.email,
+            first_name: null,
+            last_name: null,
+            client_uuid: '', // No default client for admins
+            active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
           }
-        } else if (userData.client_uuid) {
-          // Regular user: Load only their client
+          setUserData(minimalUserData as any)
+        }
+        
+        // Initialize organizations as empty - will be loaded after client selection
+        setOrganizations([])
+
+        // Get all clients from clients table
+        // Ensure we have a fresh session before querying
+        const { data: { session: currentSession } } = await supabase.auth.getSession()
+        if (!currentSession) {
+          console.error('No active session when fetching clients')
+          router.push('/')
+          return
+        }
+        
+        // For regular users, only get their specific client
+        // For admins, get all clients they can access
+        if (!isAdminUser && userData?.client_uuid) {
+          // Regular user - fetch only their assigned client
           const { data: clientData, error: clientError } = await supabase
             .from('clients')
             .select('uuid, name')
@@ -76,22 +119,53 @@ export default function DashboardPage() {
             setSelectedClientUuid(clientData.uuid)
             setSelectedClient(clientData)
           }
+        } else if (isAdminUser) {
+          // Admin user - fetch all clients
+          const { data: clientsData, error: clientsError } = await supabase
+            .from('clients')
+            .select('uuid, name')
+            .order('name', { ascending: true })
+          
+          if (clientsError) {
+            console.error('Error fetching clients:', clientsError)
+          } else {
+            setClients(clientsData || [])
+            
+            // Set the user's client UUID as the default selected client UUID
+            if (userData?.client_uuid) {
+              setSelectedClientUuid(userData.client_uuid)
+              
+              // Also set the selectedClient object for display purposes
+              if (clientsData) {
+                const userClient = clientsData.find(client => client.uuid === userData.client_uuid)
+                if (userClient) {
+                  setSelectedClient(userClient)
+                }
+              }
+            } else if (clientsData && clientsData.length > 0) {
+              // For admins without a default client, select the first available client
+              const firstClient = clientsData[0]
+              if (firstClient) {
+                setSelectedClientUuid(firstClient.uuid)
+                setSelectedClient(firstClient)
+              }
+            }
+          }
         }
       } catch (error) {
-        console.error('Error loading clients:', error)
+        console.error('Error loading dashboard:', error)
+        router.push('/')
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (!authLoading) {
-      loadClients()
-    }
-  }, [user, userData, isAdmin, authLoading, supabase])
+    getUser()
+  }, [supabase, router])
 
-  // Load organizations for selected client
   const loadOrganizations = useCallback(async (clientUuid: string) => {
     try {
+      // Get organizations for this client by joining client_org_history with organizations
       const { data: relationshipData, error: relationshipError } = await supabase
         .from('client_org_history')
         .select(`
@@ -109,8 +183,10 @@ export default function DashboardPage() {
       
       if (relationshipError) {
         console.error('Error fetching client organization relationships:', relationshipError)
+        // No fallback - organizations are only shown through client relationships
         setOrganizations([])
       } else {
+        // Keep the full relationship data for table display
         const transformedOrgs = relationshipData?.map(rel => ({
           id: rel.org_uuid || '',
           name: (rel.organizations as any)?.name || '',
@@ -135,15 +211,22 @@ export default function DashboardPage() {
     }
   }, [selectedClientUuid, loadOrganizations])
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    router.push('/')
+  }
+
   // Sorting logic
   const sortedOrganizations = useMemo(() => {
     const sorted = [...organizations].sort((a, b) => {
       let aValue: any = a[sortField]
       let bValue: any = b[sortField]
 
+      // Handle null/undefined values
       if (aValue == null) aValue = 0
       if (bValue == null) bValue = 0
 
+      // String comparison for name
       if (sortField === 'name') {
         aValue = aValue.toLowerCase()
         bValue = bValue.toLowerCase()
@@ -152,6 +235,7 @@ export default function DashboardPage() {
           : bValue.localeCompare(aValue)
       }
 
+      // Numeric comparison for other fields
       return sortDirection === 'asc' 
         ? aValue - bValue 
         : bValue - aValue
@@ -171,16 +255,20 @@ export default function DashboardPage() {
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
+      // Toggle direction if clicking the same field
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
+      // Set new field with appropriate default direction
       setSortField(field)
       setSortDirection('desc')
     }
+    // Reset to first page when sorting changes
     setCurrentPage(1)
   }
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
+    // Scroll to top of table
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -190,6 +278,7 @@ export default function DashboardPage() {
       newExpandedRows.delete(orgId)
     } else {
       newExpandedRows.add(orgId)
+      // Fetch detailed data if not already loaded
       if (!orgDetails[orgId] && selectedClientUuid) {
         await fetchOrgDetails(orgId)
       }
@@ -199,6 +288,7 @@ export default function DashboardPage() {
 
   const updateOrgNotes = async (orgId: string, notes: string) => {
     try {
+      // Update notes in the database
       const { error } = await supabase
         .from('client_org_history')
         .update({ notes, updated_at: new Date().toISOString() })
@@ -209,6 +299,7 @@ export default function DashboardPage() {
         throw error
       }
 
+      // Update local state
       setOrgDetails(prev => ({
         ...prev,
         [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null,
@@ -221,6 +312,7 @@ export default function DashboardPage() {
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
+      // Fetch from client_org_history
       const { data: historyData, error: historyError } = await supabase
         .from('client_org_history')
         .select('*')
@@ -228,6 +320,7 @@ export default function DashboardPage() {
         .eq('org_uuid', orgId)
         .maybeSingle()
       
+      // Fetch organization positions
       const { data: positionsData } = await supabase
         .from('org_positions')
         .select('positions')
@@ -241,6 +334,7 @@ export default function DashboardPage() {
           [orgId]: null,
         }))
       } else {
+        // Combine history data with positions
         const combinedData = {
           ...(historyData as ClientOrganizationHistory),
           positions: positionsData?.positions || [],
@@ -257,10 +351,9 @@ export default function DashboardPage() {
         [orgId]: null,
       }))
     }
-  }
+  }  // End of fetchOrgDetails function
 
-  // Show loading state
-  if (authLoading || isLoading) {
+  if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
@@ -268,9 +361,7 @@ export default function DashboardPage() {
     )
   }
 
-  // Redirect if not authenticated
   if (!user || !userData) {
-    router.push('/')
     return null
   }
 
@@ -286,7 +377,7 @@ export default function DashboardPage() {
                   {selectedClient.name}
                 </h1>
               )}
-              {/* Only show client switcher for admins with multiple clients */}
+              {/* Only show client switcher for admins */}
               {isAdmin && clients.length > 1 && (
                 <AdminClientToggle
                   clients={clients}
@@ -295,7 +386,7 @@ export default function DashboardPage() {
                   onClientChange={(client) => {
                     setSelectedClientUuid(client.uuid)
                     setSelectedClient(client)
-                    setCurrentPage(1)
+                    setCurrentPage(1) // Reset pagination when changing clients
                   }}
                 />
               )}
@@ -303,10 +394,9 @@ export default function DashboardPage() {
             <div className="flex items-center space-x-4">
               <div className="text-sm text-gray-500">
                 Welcome, {user.user_metadata?.full_name || user.email}
-                {isAdmin && <span className="ml-2 text-xs bg-gray-100 px-2 py-1 rounded">Admin</span>}
               </div>
               <button
-                onClick={signOut}
+                onClick={handleSignOut}
                 className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700 transition-colors"
               >
                 Sign Out
@@ -493,6 +583,7 @@ export default function DashboardPage() {
                                 {orgDetails[org.id] ? (
                                   <>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                      {/* Left side - Notes */}
                                       <div>
                                         <EditableText
                                           label="Notes"
@@ -505,6 +596,7 @@ export default function DashboardPage() {
                                         />
                                       </div>
                                       
+                                      {/* Right side - Key External Contacts */}
                                       <div>
                                         <h5 className="text-sm font-medium text-gray-700 mb-2">Key Organization Contacts</h5>
                                         {(orgDetails[org.id]?.key_external_contacts?.length ?? 0) > 0 ? (
@@ -522,6 +614,7 @@ export default function DashboardPage() {
                                       </div>
                                     </div>
                                     
+                                    {/* Policy Positions Card */}
                                     {(orgDetails[org.id]?.positions?.length ?? 0) > 0 && (
                                     <div className="mt-6">
                                       <h5 className="text-sm font-medium text-gray-700 mb-3">
@@ -529,6 +622,7 @@ export default function DashboardPage() {
                                       </h5>
                                       <div className="space-y-3">
                                         {orgDetails[org.id]?.positions?.sort((a: any, b: any) => {
+                                          // Sort order: In favor -> Opposed -> No position
                                           const order: { [key: string]: number } = {
                                             'In favor': 1,
                                             'Opposed': 2,
@@ -537,6 +631,7 @@ export default function DashboardPage() {
                                           return (order[a.position] || 999) - (order[b.position] || 999)
                                         }).map((position: any, index: number) => (
                                           <div key={index} className="border border-gray-200 rounded-lg p-4">
+                                            {/* Position Header */}
                                             <div className="flex justify-between items-start mb-2">
                                               <h6 className="text-sm font-medium text-gray-900">{position.description}</h6>
                                               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -550,10 +645,12 @@ export default function DashboardPage() {
                                               </span>
                                             </div>
                                             
+                                            {/* Position Details */}
                                             <p className="text-sm text-gray-600 mb-3">
                                               {position.positionDetails}
                                             </p>
                                             
+                                            {/* Reference Materials */}
                                             {position.referenceMaterials && position.referenceMaterials.length > 0 && (
                                               <div>
                                                 <p className="text-xs font-medium text-gray-500 mb-1">References:</p>
@@ -597,6 +694,7 @@ export default function DashboardPage() {
                     ))}
                   </tbody>
                 </table>
+                {/* Pagination */}
                 {sortedOrganizations.length > itemsPerPage && (
                   <Pagination
                     currentPage={currentPage}

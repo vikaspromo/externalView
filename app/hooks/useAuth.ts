@@ -11,6 +11,7 @@ export interface AuthState {
   user: any | null
   userData: User | null
   isLoading: boolean
+  isAdmin: boolean
   signOut: () => Promise<void>
 }
 
@@ -18,6 +19,7 @@ export const useAuth = (): AuthState => {
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
 
@@ -54,6 +56,7 @@ export const useAuth = (): AuthState => {
           .single()
         
         if (adminUser) {
+          setIsAdmin(true)
           const minimalUserData: User = {
             id: session.user.id,
             email: session.user.email!,
@@ -107,6 +110,7 @@ export const useAuth = (): AuthState => {
     user,
     userData,
     isLoading,
+    isAdmin,
     signOut,
   }
 }
