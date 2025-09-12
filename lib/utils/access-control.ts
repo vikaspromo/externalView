@@ -4,6 +4,7 @@
  */
 
 import { User } from '@/lib/supabase/types'
+import { SecurityAuditLog } from '@/lib/types/audit'
 import { writeAuditLog } from '@/lib/services/audit-log'
 import { logger } from '@/lib/utils/logger'
 
@@ -174,15 +175,6 @@ export function validateOrgAccess(
  * Security audit logging helper
  * Use this to log security-relevant operations
  */
-export interface SecurityAuditLog {
-  event_type: 'access_denied' | 'unauthorized_attempt' | 'admin_override'
-  user_id: string | undefined
-  client_uuid: string | null | undefined
-  target_client_uuid?: string | null
-  operation: string
-  metadata?: Record<string, any>
-}
-
 export async function logSecurityEvent(event: SecurityAuditLog): Promise<void> {
   // Log security events only in development
   logger.security(event.event_type, event)
