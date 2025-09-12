@@ -5,6 +5,7 @@
 import { useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Client } from '@/lib/supabase/types'
+import { logger } from '@/lib/utils/logger'
 
 export interface ClientsState {
   clients: Client[]
@@ -37,7 +38,7 @@ export const useClients = (): ClientsState => {
         setSelectedClient(clientData as Client)
       }
     } catch (error) {
-      console.error('Error loading clients:', error)
+      logger.error('Error loading clients', error)
     }
   }
 

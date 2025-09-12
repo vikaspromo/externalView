@@ -3,6 +3,7 @@
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { logger } from '@/lib/utils/logger'
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -54,10 +55,10 @@ export default function HomePage() {
         },
       })
       if (error) {
-        console.error('Error signing in:', error.message)
+        logger.error('Error signing in', error)
       }
     } catch (error) {
-      console.error('Unexpected error:', error)
+      logger.error('Unexpected error during sign in', error)
     } finally {
       setIsLoading(false)
     }

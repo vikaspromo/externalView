@@ -2,15 +2,17 @@
  * Fixed auth hook that handles logout errors with new API keys
  */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { User } from '@/lib/supabase/types'
+import { logger } from '@/lib/utils/logger'
 
 export interface AuthState {
   user: any | null
   userData: User | null
   isLoading: boolean
+  isAdmin: boolean
   signOut: () => Promise<void>
 }
 
@@ -18,8 +20,30 @@ export const useAuth = (): AuthState => {
   const [user, setUser] = useState<any>(null)
   const [userData, setUserData] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
   const router = useRouter()
   const supabase = createClientComponentClient()
+
+  const signOut = useCallback(async () => {
+    try {
+      // Try to sign out normally
+      await supabase.auth.signOut()
+    } catch (error) {
+      // If logout fails (403 with new keys), clear local session anyway
+      // This is expected behavior with new API keys
+      
+      // Clear local storage to force re-authentication
+      if (typeof window !== 'undefined') {
+        // Clear Supabase auth storage
+        const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`
+        localStorage.removeItem(storageKey)
+        sessionStorage.clear()
+      }
+    } finally {
+      // Always redirect to home
+      router.push('/')
+    }
+  }, [supabase, router])
 
   useEffect(() => {
     const getUser = async () => {
@@ -54,6 +78,7 @@ export const useAuth = (): AuthState => {
           .single()
         
         if (adminUser) {
+          setIsAdmin(true)
           const minimalUserData: User = {
             id: session.user.id,
             email: session.user.email!,
@@ -72,7 +97,7 @@ export const useAuth = (): AuthState => {
         await signOut()
         return
       } catch (error) {
-        console.error('Auth error:', error)
+        logger.error('Auth error', error)
         router.push('/')
       } finally {
         setIsLoading(false)
@@ -80,33 +105,13 @@ export const useAuth = (): AuthState => {
     }
 
     getUser()
-  }, [supabase, router])
-
-  const signOut = async () => {
-    try {
-      // Try to sign out normally
-      await supabase.auth.signOut()
-    } catch (error) {
-      // If logout fails (403 with new keys), clear local session anyway
-      console.warn('Logout error (expected with new API keys):', error)
-      
-      // Clear local storage to force re-authentication
-      if (typeof window !== 'undefined') {
-        // Clear Supabase auth storage
-        const storageKey = `sb-${process.env.NEXT_PUBLIC_SUPABASE_URL?.split('//')[1]?.split('.')[0]}-auth-token`
-        localStorage.removeItem(storageKey)
-        sessionStorage.clear()
-      }
-    } finally {
-      // Always redirect to home
-      router.push('/')
-    }
-  }
+  }, [supabase, router, signOut])
 
   return {
     user,
     userData,
     isLoading,
+    isAdmin,
     signOut,
   }
 }
