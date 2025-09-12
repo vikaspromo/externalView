@@ -10,7 +10,12 @@ import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
 import { Pagination } from '@/app/components/ui/Pagination'
 import { useAuth } from '@/app/hooks/useAuth'
+// Feature flag for RLS mode
+import { USE_SIMPLIFIED_RLS } from '@/lib/config/features'
+
+// Import both old and new access control (tree-shaken in production)
 import { requireClientAccess, validateClientAccess, logSecurityEvent } from '@/lib/utils/access-control'
+import RLSHelper from '@/lib/utils/rls-helper'
 import { logger } from '@/lib/utils/logger'
 
 export default function DashboardPage() {
@@ -204,22 +209,44 @@ export default function DashboardPage() {
 
   const updateOrgNotes = async (orgId: string, notes: string) => {
     try {
-      // Validate client access before attempting update
-      requireClientAccess(
-        selectedClientUuid,
-        userData,
-        isAdmin,
-        'update organization notes'
-      )
+      if (USE_SIMPLIFIED_RLS) {
+        // Simplified mode: Let database handle access control
+        await RLSHelper.executeWithAudit(
+          async () => {
+            const { error } = await supabase
+              .from('client_org_history')
+              .update({ notes, updated_at: new Date().toISOString() })
+              .eq('client_uuid', selectedClientUuid)
+              .eq('org_uuid', orgId)
+            
+            if (error) throw error
+          },
+          {
+            operation: 'update organization notes',
+            userId: user?.id,
+            clientUuid: userData?.client_uuid || null,
+            targetId: selectedClientUuid,
+            metadata: { orgId },
+          }
+        )
+      } else {
+        // Legacy mode: Application-layer access control
+        requireClientAccess(
+          selectedClientUuid,
+          userData,
+          isAdmin,
+          'update organization notes'
+        )
 
-      const { error } = await supabase
-        .from('client_org_history')
-        .update({ notes, updated_at: new Date().toISOString() })
-        .eq('client_uuid', selectedClientUuid)
-        .eq('org_uuid', orgId)
+        const { error } = await supabase
+          .from('client_org_history')
+          .update({ notes, updated_at: new Date().toISOString() })
+          .eq('client_uuid', selectedClientUuid)
+          .eq('org_uuid', orgId)
 
-      if (error) {
-        throw error
+        if (error) {
+          throw error
+        }
       }
 
       setOrgDetails(prev => ({
@@ -229,8 +256,8 @@ export default function DashboardPage() {
     } catch (error) {
       logger.error('Error updating notes', error)
       
-      // Log security events for unauthorized attempts
-      if (error instanceof Error && error.message.includes('Unauthorized')) {
+      // Log security events for unauthorized attempts (legacy mode only)
+      if (!USE_SIMPLIFIED_RLS && error instanceof Error && error.message.includes('Unauthorized')) {
         logSecurityEvent({
           event_type: 'unauthorized_attempt',
           user_id: user?.id,
@@ -247,17 +274,22 @@ export default function DashboardPage() {
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
-      // Validate client access before fetching details
-      if (!validateClientAccess(selectedClientUuid, userData, isAdmin)) {
-        logSecurityEvent({
-          event_type: 'access_denied',
-          user_id: user?.id,
-          client_uuid: userData?.client_uuid,
-          target_client_uuid: selectedClientUuid,
-          operation: 'fetch_org_details',
-          metadata: { orgId },
-        })
-        return
+      if (USE_SIMPLIFIED_RLS) {
+        // Simplified mode: Database will handle access control automatically
+        // No pre-validation needed - RLS will filter results
+      } else {
+        // Legacy mode: Validate client access before fetching details
+        if (!validateClientAccess(selectedClientUuid, userData, isAdmin)) {
+          logSecurityEvent({
+            event_type: 'access_denied',
+            user_id: user?.id,
+            client_uuid: userData?.client_uuid,
+            target_client_uuid: selectedClientUuid,
+            operation: 'fetch_org_details',
+            metadata: { orgId },
+          })
+          return
+        }
       }
 
       const { data: historyData, error: historyError } = await supabase
