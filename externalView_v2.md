@@ -63,8 +63,8 @@ ANTHROPIC_API_KEY=sk-ant-...
 ```sql
 -- Standard PostgreSQL only (works on AWS RDS)
 
--- 1. Tenants (clients)
-CREATE TABLE tenants (
+-- 1. Clients (your paying customers)
+CREATE TABLE clients (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -73,7 +73,7 @@ CREATE TABLE tenants (
 -- 2. Users
 CREATE TABLE users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id UUID REFERENCES tenants(id),
+  client_id UUID REFERENCES clients(id),
   email TEXT NOT NULL,
   auth_user_id UUID UNIQUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
@@ -82,7 +82,7 @@ CREATE TABLE users (
 -- 3. Organizations
 CREATE TABLE organizations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  tenant_id UUID REFERENCES tenants(id),
+  client_id UUID REFERENCES clients(id),
   name TEXT NOT NULL,
   ein TEXT,
   website TEXT,
@@ -94,7 +94,7 @@ CREATE TABLE organizations (
 CREATE TABLE positions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   organization_id UUID REFERENCES organizations(id),
-  tenant_id UUID REFERENCES tenants(id),
+  client_id UUID REFERENCES clients(id),
   issue TEXT,
   stance TEXT,
   details TEXT,
@@ -106,7 +106,7 @@ CREATE TABLE audit_log (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   timestamp TIMESTAMPTZ DEFAULT NOW(),
   user_id UUID,
-  tenant_id UUID,
+  client_id UUID,
   action TEXT,
   table_name TEXT,
   record_id UUID,
@@ -114,10 +114,10 @@ CREATE TABLE audit_log (
 );
 
 -- Basic indexes
-CREATE INDEX idx_users_tenant ON users(tenant_id);
-CREATE INDEX idx_orgs_tenant ON organizations(tenant_id);
-CREATE INDEX idx_positions_tenant ON positions(tenant_id);
-CREATE INDEX idx_audit_tenant ON audit_log(tenant_id, timestamp);
+CREATE INDEX idx_users_client ON users(client_id);
+CREATE INDEX idx_orgs_client ON organizations(client_id);
+CREATE INDEX idx_positions_client ON positions(client_id);
+CREATE INDEX idx_audit_client ON audit_log(client_id, timestamp);
 ```
 
 ### Day 3: Critical Abstractions (MUST HAVE)
@@ -195,7 +195,7 @@ import { SupabaseRepository } from './repository'
 
 // When moving to AWS, just change these to PostgresRepository
 export const db = {
-  tenants: new SupabaseRepository('tenants'),
+  clients: new SupabaseRepository('clients'),
   users: new SupabaseRepository('users'),
   organizations: new SupabaseRepository('organizations'),
   positions: new SupabaseRepository('positions'),
@@ -208,7 +208,7 @@ export const db = {
 interface AuthUser {
   id: string
   email: string
-  tenant_id?: string
+  client_id?: string
 }
 
 // Supabase auth (swap for Cognito later)
@@ -223,38 +223,38 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
   
-  // Get tenant from users table
+  // Get client from users table
   const { data } = await db.users.findOne({ auth_user_id: user.id })
   return {
     id: user.id,
     email: user.email!,
-    tenant_id: data?.tenant_id
+    client_id: data?.client_id
   }
 }
 
-export async function getTenantId(): Promise<string | null> {
+export async function getClientId(): Promise<string | null> {
   const user = await getCurrentUser()
-  return user?.tenant_id || null
+  return user?.client_id || null
 }
 ```
 
 ## Core Features (Day 4-7)
 
-### Day 4: Simple Tenant Context
+### Day 4: Simple Client Context
 
-**lib/tenant.ts:**
+**lib/client.ts:**
 ```typescript
-// Simple tenant filtering (no complex RLS needed)
-export async function getTenantData<T>(
+// Simple client filtering (no complex RLS needed)
+export async function getClientData<T>(
   repo: Repository<T>,
   additionalFilter?: Partial<T>
 ): Promise<T[]> {
-  const tenantId = await getTenantId()
-  if (!tenantId) throw new Error('No tenant context')
+  const clientId = await getClientId()
+  if (!clientId) throw new Error('No client context')
   
   return repo.findAll({
     ...additionalFilter,
-    tenant_id: tenantId
+    client_id: clientId
   } as Partial<T>)
 }
 
@@ -268,7 +268,7 @@ export async function logAction(
   const user = await getCurrentUser()
   await db.audit.create({
     user_id: user?.id,
-    tenant_id: user?.tenant_id,
+    client_id: user?.client_id,
     action,
     table_name: table,
     record_id: recordId,
@@ -299,12 +299,12 @@ export async function analyzeOrganization(orgName: string) {
   
   // Parse and save
   const positions = JSON.parse(response.content[0].text)
-  const tenantId = await getTenantId()
+  const clientId = await getClientId()
   
   for (const pos of positions) {
     await db.positions.create({
       ...pos,
-      tenant_id: tenantId,
+      client_id: clientId,
       analyzed_at: new Date()
     })
   }
@@ -338,7 +338,7 @@ export async function getOrgEIN(name: string): Promise<string | null> {
 **app/dashboard/page.tsx:**
 ```typescript
 export default async function Dashboard() {
-  const orgs = await getTenantData(db.organizations)
+  const orgs = await getClientData(db.organizations)
   
   return (
     <div className="p-6">
@@ -367,12 +367,12 @@ export default async function Dashboard() {
 async function createOrg(formData: FormData) {
   const name = formData.get('name') as string
   const ein = await getOrgEIN(name)
-  const tenantId = await getTenantId()
+  const clientId = await getClientId()
   
   await db.organizations.create({
     name,
     ein,
-    tenant_id: tenantId
+    client_id: clientId
   })
   
   await logAction('create', 'organizations')
@@ -442,7 +442,7 @@ export const db = {
 
 Even in this simplified version, we have:
 1. **Audit logging** - Every action logged
-2. **Tenant isolation** - Data separated by tenant_id
+2. **Client isolation** - Data separated by client_id
 3. **User tracking** - Know who did what
 4. **Timestamps** - Know when things happened
 

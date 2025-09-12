@@ -34,8 +34,8 @@ Use this prompt with Claude Code to set up your new project:
 
 5. **Create the database schema** with these 5 tables using STANDARD PostgreSQL (no Supabase-specific features):
    ```sql
-   -- tenants table
-   CREATE TABLE tenants (
+   -- clients table (your paying customers)
+   CREATE TABLE clients (
      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
      name TEXT NOT NULL,
      created_at TIMESTAMPTZ DEFAULT NOW()
@@ -44,7 +44,7 @@ Use this prompt with Claude Code to set up your new project:
    -- users table  
    CREATE TABLE users (
      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-     tenant_id UUID REFERENCES tenants(id),
+     client_id UUID REFERENCES clients(id),
      email TEXT NOT NULL,
      auth_user_id UUID UNIQUE,
      created_at TIMESTAMPTZ DEFAULT NOW()
@@ -53,7 +53,7 @@ Use this prompt with Claude Code to set up your new project:
    -- organizations table
    CREATE TABLE organizations (
      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-     tenant_id UUID REFERENCES tenants(id),
+     client_id UUID REFERENCES clients(id),
      name TEXT NOT NULL,
      ein TEXT,
      website TEXT,
@@ -65,7 +65,7 @@ Use this prompt with Claude Code to set up your new project:
    CREATE TABLE positions (
      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
      organization_id UUID REFERENCES organizations(id),
-     tenant_id UUID REFERENCES tenants(id),
+     client_id UUID REFERENCES clients(id),
      issue TEXT,
      stance TEXT,
      details TEXT,
@@ -77,7 +77,7 @@ Use this prompt with Claude Code to set up your new project:
      id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
      timestamp TIMESTAMPTZ DEFAULT NOW(),
      user_id UUID,
-     tenant_id UUID,
+     client_id UUID,
      action TEXT,
      table_name TEXT,
      record_id UUID,
@@ -85,10 +85,10 @@ Use this prompt with Claude Code to set up your new project:
    );
 
    -- Basic indexes
-   CREATE INDEX idx_users_tenant ON users(tenant_id);
-   CREATE INDEX idx_orgs_tenant ON organizations(tenant_id);
-   CREATE INDEX idx_positions_tenant ON positions(tenant_id);
-   CREATE INDEX idx_audit_tenant ON audit_log(tenant_id, timestamp);
+   CREATE INDEX idx_users_client ON users(client_id);
+   CREATE INDEX idx_orgs_client ON organizations(client_id);
+   CREATE INDEX idx_positions_client ON positions(client_id);
+   CREATE INDEX idx_audit_client ON audit_log(client_id, timestamp);
    ```
 
 6. **Create the Repository pattern** in `lib/db/repository.ts`:
@@ -102,7 +102,7 @@ Use this prompt with Claude Code to set up your new project:
 
 8. **Create auth abstraction** in `lib/auth/index.ts`:
    - getCurrentUser() function
-   - getTenantId() helper
+   - getClientId() helper
    - Wraps Supabase auth but can swap to Cognito later
 
 9. **Set up GitHub Secrets for secure key storage**:
@@ -139,7 +139,7 @@ Use this prompt with Claude Code to set up your new project:
 10. **Create a minimal dashboard** at `app/dashboard/page.tsx`:
     - List organizations
     - Add new organization form
-    - Simple tenant filtering
+    - Simple client filtering
 
 11. **Push to GitHub**:
     ```bash
@@ -154,7 +154,7 @@ Use this prompt with Claude Code to set up your new project:
 - Use ONLY standard PostgreSQL (no Supabase-specific features like RLS)
 - Keep everything minimal - this is a 2-week prototype
 - Build clean abstractions (Repository pattern, Auth interface) for AWS migration
-- Simple tenant filtering at application level (no complex RLS)
+- Simple client filtering at application level (no complex RLS)
 - Include basic audit logging for SOC 2 compliance
 - Focus on shipping fast with room to migrate later
 
