@@ -8,12 +8,16 @@
     "build:ci": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "check:all": "npm run lint && npm run typecheck",
     "test": "jest --passWithNoTests",
     "test:watch": "jest --watch --passWithNoTests",
     "test:coverage": "jest --coverage --passWithNoTests",
     "check:env": "node scripts/check-env.js",
     "predev": "npm run check:env",
-    "prebuild": "npm run check:env"
+    "prebuild": "npm run check:env",
+    "precommit": "npm run check:all",
+    "prepare": "husky"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.61.0",
@@ -37,6 +41,7 @@
     "dotenv": "^17.2.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.15",
+    "husky": "^9.1.7",
     "jest": "^30.1.3",
     "jest-environment-jsdom": "^30.1.2",
     "postcss": "^8.4.47",
