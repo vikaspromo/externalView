@@ -11,6 +11,7 @@ import { EditableText } from '@/app/components/ui/EditableText'
 import { Pagination } from '@/app/components/ui/Pagination'
 import { useAuth } from '@/app/hooks/useAuth'
 import { requireClientAccess, validateClientAccess, logSecurityEvent } from '@/lib/utils/access-control'
+import { logger } from '@/lib/utils/logger'
 
 export default function DashboardPage() {
   const { user, userData, isLoading: authLoading, isAdmin, signOut } = useAuth()
@@ -44,7 +45,7 @@ export default function DashboardPage() {
             .order('name', { ascending: true })
           
           if (clientsError) {
-            console.error('Error fetching clients:', clientsError)
+            logger.error('Error fetching clients', clientsError)
           } else if (clientsData) {
             setClients(clientsData)
             
@@ -71,7 +72,7 @@ export default function DashboardPage() {
             .single()
           
           if (clientError) {
-            console.error('Error fetching user client:', clientError)
+            logger.error('Error fetching user client', clientError)
           } else if (clientData) {
             setClients([clientData])
             setSelectedClientUuid(clientData.uuid)
@@ -79,7 +80,7 @@ export default function DashboardPage() {
           }
         }
       } catch (error) {
-        console.error('Error loading clients:', error)
+        logger.error('Error loading clients', error)
       } finally {
         setIsLoading(false)
       }
@@ -109,7 +110,7 @@ export default function DashboardPage() {
         .eq('client_uuid', clientUuid)
       
       if (relationshipError) {
-        console.error('Error fetching client organization relationships:', relationshipError)
+        logger.error('Error fetching client organization relationships', relationshipError)
         setOrganizations([])
       } else {
         const transformedOrgs = relationshipData?.map(rel => ({
@@ -125,7 +126,7 @@ export default function DashboardPage() {
         setOrganizations(transformedOrgs)
       }
     } catch (error) {
-      console.error('Error in loadOrganizations:', error)
+      logger.error('Error in loadOrganizations', error)
     }
   }, [supabase])
 
@@ -223,7 +224,7 @@ export default function DashboardPage() {
         [orgId]: prev[orgId] ? { ...prev[orgId], notes } : null,
       }))
     } catch (error) {
-      console.error('Error updating notes:', error)
+      logger.error('Error updating notes', error)
       
       // Log security events for unauthorized attempts
       if (error instanceof Error && error.message.includes('Unauthorized')) {
@@ -253,7 +254,6 @@ export default function DashboardPage() {
           operation: 'fetch_org_details',
           metadata: { orgId }
         })
-        console.error('Unauthorized: Cannot fetch details for this client')
         return
       }
 
@@ -271,7 +271,7 @@ export default function DashboardPage() {
         .maybeSingle()
       
       if (historyError) {
-        console.error('Error fetching organization details:', historyError)
+        logger.error('Error fetching organization details', historyError)
         setOrgDetails(prev => ({
           ...prev,
           [orgId]: null,
@@ -287,7 +287,7 @@ export default function DashboardPage() {
         }))
       }
     } catch (error) {
-      console.error('Unexpected error in fetchOrgDetails:', error)
+      logger.error('Unexpected error in fetchOrgDetails', error)
       setOrgDetails(prev => ({
         ...prev,
         [orgId]: null,

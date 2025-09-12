@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { useRouter } from 'next/navigation'
 import { User } from '@/lib/supabase/types'
+import { logger } from '@/lib/utils/logger'
 
 export interface AuthState {
   user: any | null
@@ -75,7 +76,7 @@ export const useAuth = (): AuthState => {
         await signOut()
         return
       } catch (error) {
-        console.error('Auth error:', error)
+        logger.error('Auth error', error)
         router.push('/')
       } finally {
         setIsLoading(false)
@@ -91,7 +92,7 @@ export const useAuth = (): AuthState => {
       await supabase.auth.signOut()
     } catch (error) {
       // If logout fails (403 with new keys), clear local session anyway
-      console.warn('Logout error (expected with new API keys):', error)
+      // This is expected behavior with new API keys
       
       // Clear local storage to force re-authentication
       if (typeof window !== 'undefined') {

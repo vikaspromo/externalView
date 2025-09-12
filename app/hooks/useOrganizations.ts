@@ -5,6 +5,7 @@
 import { useState, useCallback } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Organization, ClientOrganizationHistory } from '@/lib/supabase/types'
+import { logger } from '@/lib/utils/logger'
 
 export interface OrganizationsState {
   organizations: Organization[]
@@ -43,7 +44,7 @@ export const useOrganizations = (): OrganizationsState => {
         .eq('client_uuid', clientUuid)
       
       if (relationshipError) {
-        console.error('Error fetching client organization relationships:', relationshipError)
+        logger.error('Error fetching client organization relationships', relationshipError)
         setOrganizations([])
       } else {
         // Keep the full relationship data for table display
@@ -60,7 +61,7 @@ export const useOrganizations = (): OrganizationsState => {
         setOrganizations(transformedOrgs)
       }
     } catch (error) {
-      console.error('Error in loadOrganizations:', error)
+      logger.error('Error in loadOrganizations', error)
     }
   }, [supabase])
 
@@ -82,7 +83,7 @@ export const useOrganizations = (): OrganizationsState => {
         .maybeSingle()
       
       if (historyError) {
-        console.error('Error fetching organization details:', historyError)
+        logger.error('Error fetching organization details', historyError)
         setOrgDetails(prev => ({
           ...prev,
           [orgId]: null,
@@ -99,7 +100,7 @@ export const useOrganizations = (): OrganizationsState => {
         }))
       }
     } catch (error) {
-      console.error('Unexpected error in fetchOrgDetails:', error)
+      logger.error('Unexpected error in fetchOrgDetails', error)
       setOrgDetails(prev => ({
         ...prev,
         [orgId]: null,

@@ -4,6 +4,8 @@
  */
 
 import { User } from '@/lib/supabase/types'
+import { writeAuditLog } from '@/lib/services/audit-log'
+import { logger } from '@/lib/utils/logger'
 
 /**
  * Validates if a user has access to a specific client's data
@@ -181,10 +183,15 @@ export interface SecurityAuditLog {
   metadata?: Record<string, any>
 }
 
-export function logSecurityEvent(event: SecurityAuditLog): void {
-  // In production, this would send to your audit logging service
-  console.warn('[SECURITY AUDIT]', {
-    timestamp: new Date().toISOString(),
-    ...event
-  })
+export async function logSecurityEvent(event: SecurityAuditLog): Promise<void> {
+  // Log security events only in development
+  logger.security(event.event_type, event)
+  
+  // Write to database for persistence
+  if (typeof window !== 'undefined') {
+    // Don't await to prevent blocking the UI
+    writeAuditLog(event).catch(error => {
+      logger.error('Failed to write security event to database', error)
+    })
+  }
 }
