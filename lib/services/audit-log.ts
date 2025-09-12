@@ -26,12 +26,12 @@ export async function writeAuditLog(event: SecurityAuditLog): Promise<void> {
         operation: event.operation,
         target_client_uuid: event.target_client_uuid,
         timestamp: new Date().toISOString(),
-        source: 'frontend'
+        source: 'frontend',
       },
       // Note: IP address and user agent would typically be captured server-side
       // For frontend logging, we'll include what we can
       user_agent: typeof window !== 'undefined' ? navigator.userAgent : null,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     }
     
     // Insert the audit log entry
@@ -115,7 +115,7 @@ export const AUDIT_EVENT_TYPES = {
   
   // System events
   SYSTEM_ERROR: 'system_error',
-  CONFIGURATION_CHANGE: 'configuration_change'
+  CONFIGURATION_CHANGE: 'configuration_change',
 } as const
 
 /**
@@ -133,7 +133,7 @@ export function createAuditEvent(
     user_id: userId,
     client_uuid: clientUuid,
     operation,
-    metadata: metadata || {}
+    metadata: metadata || {},
   }
 }
 
@@ -176,7 +176,7 @@ export async function getAuditSummary(
       totalEvents: events.length,
       accessDenied: events.filter(e => e.event_type === 'access_denied').length,
       unauthorizedAttempts: events.filter(e => e.event_type === 'unauthorized_attempt').length,
-      recentEvents: events.slice(0, 10)
+      recentEvents: events.slice(0, 10),
     }
   } catch (error) {
     logger.error('Unexpected error getting audit summary', error)
@@ -184,7 +184,7 @@ export async function getAuditSummary(
       totalEvents: 0,
       accessDenied: 0,
       unauthorizedAttempts: 0,
-      recentEvents: []
+      recentEvents: [],
     }
   }
 }

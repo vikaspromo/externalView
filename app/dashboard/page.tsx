@@ -234,7 +234,7 @@ export default function DashboardPage() {
           client_uuid: userData?.client_uuid,
           target_client_uuid: selectedClientUuid,
           operation: 'update_org_notes',
-          metadata: { orgId }
+          metadata: { orgId },
         })
       }
       
@@ -252,7 +252,7 @@ export default function DashboardPage() {
           client_uuid: userData?.client_uuid,
           target_client_uuid: selectedClientUuid,
           operation: 'fetch_org_details',
-          metadata: { orgId }
+          metadata: { orgId },
         })
         return
       }

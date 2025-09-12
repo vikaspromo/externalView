@@ -18,7 +18,7 @@ interface LoggerConfig {
 const config: LoggerConfig = {
   enabled: isDevelopment || isTest,
   logToConsole: isDevelopment,
-  logLevel: 'error' // Only log errors and above in production
+  logLevel: 'error', // Only log errors and above in production
 }
 
 /**
@@ -91,7 +91,7 @@ export const logger = {
       console.warn('[SECURITY]', event, metadata)
     }
     // In production, use the audit log service instead
-  }
+  },
 }
 
 /**
@@ -137,7 +137,7 @@ export const devLog = isDevelopment ? {
   debug: console.debug,
   table: console.table,
   time: console.time,
-  timeEnd: console.timeEnd
+  timeEnd: console.timeEnd,
 } : {
   log: () => {},
   error: () => {},
@@ -146,7 +146,7 @@ export const devLog = isDevelopment ? {
   debug: () => {},
   table: () => {},
   time: () => {},
-  timeEnd: () => {}
+  timeEnd: () => {},
 }
 
 export default logger
