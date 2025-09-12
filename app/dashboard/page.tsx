@@ -57,7 +57,7 @@ export default function DashboardPage() {
                 setSelectedClientUuid(userClient.uuid)
                 setSelectedClient(userClient)
               }
-            } else if (clientsData.length > 0) {
+            } else if (clientsData?.length > 0) {
               // Otherwise use first client
               setSelectedClientUuid(clientsData[0].uuid)
               setSelectedClient(clientsData[0])
