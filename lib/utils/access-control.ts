@@ -139,7 +139,7 @@ export function getScopedClientUuid(
  * Builds a Supabase query filter based on user's access level
  * Use this to automatically add client filtering to queries
  */
-export function applyClientFilter<T extends { client_uuid?: string }>(
+export function applyClientFilter(
   query: any,
   userData: User | null,
   isAdmin: boolean

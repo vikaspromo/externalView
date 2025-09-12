@@ -56,7 +56,7 @@ export async function writeAuditLog(event: SecurityAuditLog): Promise<void> {
  * @param limit - Maximum number of logs to fetch
  */
 export async function fetchAuditLogs(
-  isAdmin: boolean,
+  _isAdmin: boolean,
   limit: number = 100
 ): Promise<any[]> {
   try {
@@ -141,7 +141,7 @@ export function createAuditEvent(
  * Get a summary of recent audit events for dashboard display
  */
 export async function getAuditSummary(
-  isAdmin: boolean,
+  _isAdmin: boolean,
   hours: number = 24
 ): Promise<{
   totalEvents: number

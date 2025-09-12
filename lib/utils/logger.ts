@@ -33,6 +33,7 @@ export const logger = {
   debug: (...args: any[]): void => {
     if (config.enabled && config.logLevel === 'debug') {
       if (config.logToConsole) {
+        // eslint-disable-next-line no-console
         console.debug('[DEBUG]', ...args)
       }
     }
@@ -44,6 +45,7 @@ export const logger = {
   info: (...args: any[]): void => {
     if (config.enabled && ['debug', 'info'].includes(config.logLevel)) {
       if (config.logToConsole) {
+        // eslint-disable-next-line no-console
         console.info('[INFO]', ...args)
       }
     }
@@ -55,6 +57,7 @@ export const logger = {
   warn: (...args: any[]): void => {
     if (config.enabled && ['debug', 'info', 'warn'].includes(config.logLevel)) {
       if (config.logToConsole) {
+        // eslint-disable-next-line no-console
         console.warn('[WARN]', ...args)
       }
     }
@@ -67,6 +70,7 @@ export const logger = {
   error: (message: string, error?: any): void => {
     if (config.enabled) {
       if (config.logToConsole) {
+        // eslint-disable-next-line no-console
         console.error('[ERROR]', message, error)
       }
     }
@@ -88,6 +92,7 @@ export const logger = {
    */
   security: (event: string, metadata?: any): void => {
     if (isDevelopment) {
+      // eslint-disable-next-line no-console
       console.warn('[SECURITY]', event, metadata)
     }
     // In production, use the audit log service instead

@@ -50,7 +50,7 @@ export default function DashboardPage() {
             setClients(clientsData)
             
             // Set initial client selection
-            if (userData.client_uuid) {
+            if (userData.client_uuid && clientsData) {
               // Use user's default client if they have one
               const userClient = clientsData.find(c => c.uuid === userData.client_uuid)
               if (userClient) {
@@ -59,8 +59,11 @@ export default function DashboardPage() {
               }
             } else if (clientsData && clientsData.length > 0) {
               // Otherwise use first client
-              setSelectedClientUuid(clientsData[0].uuid)
-              setSelectedClient(clientsData[0])
+              const firstClient = clientsData[0]
+              if (firstClient) {
+                setSelectedClientUuid(firstClient.uuid)
+                setSelectedClient(firstClient)
+              }
             }
           }
         } else if (userData.client_uuid) {
