@@ -22,14 +22,25 @@ if [ -n "$CODESPACE_NAME" ]; then
         sed -i "s|NEXT_PUBLIC_APP_URL=.*|NEXT_PUBLIC_APP_URL=$APP_URL|" /workspaces/externalView/.env.local
         echo "✅ Updated .env.local with Codespace URL"
     else
-        echo "⚠️  .env.local not found, creating from template..."
-        # Create .env.local if it doesn't exist
+        echo "⚠️  .env.local not found"
+        echo "📝 Please create .env.local from .env.example:"
+        echo "   cp .env.example .env.local"
+        echo "   Then update it with your Supabase project credentials"
+        echo ""
+        echo "🔐 For security reasons, we no longer create .env.local automatically."
+        echo "   Get your credentials from: https://app.supabase.com/project/_/settings/api"
+        
+        # Create a minimal .env.local with just the APP_URL for Codespaces
         cat > /workspaces/externalView/.env.local << EOF
-NEXT_PUBLIC_SUPABASE_URL=https://vohyhkjygvkaxlmqkbem.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvaHloa2p5Z3ZrYXhsbXFrYmVtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ5NTI3NDcsImV4cCI6MjA3MDUyODc0N30.VzSvIk5psbVauOARGu5pP4ekRlukc0bEkr25R4ZhxRk
-SUPABASE_SERVICE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvaHloa2p5Z3ZrYXhsbXFrYmVtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDk1Mjc0NywiZXhwIjoyMDcwNTI4NzQ3fQ.8yVCYgR5qmfb-YFCj08UzeVWyVt60UTErZ7z736LYkY
+# Minimal configuration for Codespaces
+# Please add your Supabase credentials below:
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_KEY=your_supabase_service_key_here
 NEXT_PUBLIC_APP_URL=$APP_URL
 EOF
+        
+        echo "⚠️  Created .env.local with placeholders. Please update with real values."
     fi
 else
     echo "⚠️  Not running in a Codespace, using localhost"
