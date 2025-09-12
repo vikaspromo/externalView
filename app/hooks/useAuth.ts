@@ -64,12 +64,7 @@ export const useAuth = (): AuthState => {
           .eq('id', session.user.id)
           .single()
         
-        if (allowedUser) {
-          setUserData(allowedUser as User)
-          return
-        }
-        
-        // Check if they're an admin
+        // ALSO check if they're an admin (don't return early!)
         const { data: adminUser } = await supabase
           .from('user_admins')
           .select('*')
@@ -77,8 +72,18 @@ export const useAuth = (): AuthState => {
           .eq('active', true)
           .single()
         
+        // Set admin flag if user is in admin table
         if (adminUser) {
           setIsAdmin(true)
+        }
+        
+        // Now handle the user data
+        if (allowedUser) {
+          // User is in users table - use their data
+          setUserData(allowedUser as User)
+          return
+        } else if (adminUser) {
+          // Admin-only user (not in users table)
           const minimalUserData: User = {
             id: session.user.id,
             email: session.user.email!,
@@ -93,7 +98,7 @@ export const useAuth = (): AuthState => {
           return
         }
         
-        // User not authorized
+        // User not authorized in either table
         await signOut()
         return
       } catch (error) {
