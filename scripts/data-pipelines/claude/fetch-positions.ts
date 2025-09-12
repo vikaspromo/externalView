@@ -204,6 +204,15 @@ async function savePositionsToDatabase(
 async function main() {
   console.log('🚀 Starting Organization Positions Fetch...\n')
   
+  // Security warning for data pipeline scripts
+  console.log('⚠️  WARNING: This script modifies production data.')
+  console.log('⚠️  Only run this if you have admin authorization.')
+  console.log('🔐 This script uses service role key with elevated privileges.\n')
+  
+  // Note: These scripts run with SUPABASE_SERVICE_KEY which bypasses RLS
+  // They should only be run by administrators with proper authorization
+  // The service key itself is a form of admin authentication
+  
   // Check if the org_positions table exists
   const { error: tableCheckError } = await supabase
     .from('org_positions')

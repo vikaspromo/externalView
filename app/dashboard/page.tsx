@@ -10,6 +10,7 @@ import { AdminClientToggle } from '@/app/components/dashboard/AdminClientToggle'
 import { EditableText } from '@/app/components/ui/EditableText'
 import { Pagination } from '@/app/components/ui/Pagination'
 import { useAuth } from '@/app/hooks/useAuth'
+import { requireClientAccess, validateClientAccess, logSecurityEvent } from '@/lib/utils/access-control'
 
 export default function DashboardPage() {
   const { user, userData, isLoading: authLoading, isAdmin, signOut } = useAuth()
@@ -199,6 +200,14 @@ export default function DashboardPage() {
 
   const updateOrgNotes = async (orgId: string, notes: string) => {
     try {
+      // Validate client access before attempting update
+      requireClientAccess(
+        selectedClientUuid,
+        userData,
+        isAdmin,
+        'update organization notes'
+      )
+
       const { error } = await supabase
         .from('client_org_history')
         .update({ notes, updated_at: new Date().toISOString() })
@@ -215,12 +224,39 @@ export default function DashboardPage() {
       }))
     } catch (error) {
       console.error('Error updating notes:', error)
+      
+      // Log security events for unauthorized attempts
+      if (error instanceof Error && error.message.includes('Unauthorized')) {
+        logSecurityEvent({
+          event_type: 'unauthorized_attempt',
+          user_id: user?.id,
+          client_uuid: userData?.client_uuid,
+          target_client_uuid: selectedClientUuid,
+          operation: 'update_org_notes',
+          metadata: { orgId }
+        })
+      }
+      
       throw new Error('Failed to save notes')
     }
   }
 
   const fetchOrgDetails = async (orgId: string) => {
     try {
+      // Validate client access before fetching details
+      if (!validateClientAccess(selectedClientUuid, userData, isAdmin)) {
+        logSecurityEvent({
+          event_type: 'access_denied',
+          user_id: user?.id,
+          client_uuid: userData?.client_uuid,
+          target_client_uuid: selectedClientUuid,
+          operation: 'fetch_org_details',
+          metadata: { orgId }
+        })
+        console.error('Unauthorized: Cannot fetch details for this client')
+        return
+      }
+
       const { data: historyData, error: historyError } = await supabase
         .from('client_org_history')
         .select('*')
