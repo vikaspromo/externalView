@@ -16,7 +16,7 @@
 
 ```bash
 # Create Next.js app
-npx create-next-app@latest externalview-v2 --typescript --tailwind --app --no-src-dir
+npx create-next-app@latest externalview_0.2 --typescript --tailwind --app --no-src-dir
 
 # Install essentials only
 npm install @supabase/supabase-js @anthropic-ai/sdk zod
