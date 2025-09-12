@@ -1,5 +1,57 @@
 # Claude Code Instructions for ExternalView Project
 
+## RLS Simplification Status (2025-01-13)
+
+### Current Status: Ready for Deployment
+The RLS simplification is implemented on branch `feature/simplify-rls` and ready for deployment.
+
+### Manual Steps Required:
+
+1. **Add Environment Variable** (do this first, before deploying):
+   ```
+   NEXT_PUBLIC_USE_SIMPLIFIED_RLS=false
+   ```
+   Add this to your deployment platform (Vercel, Heroku, etc.)
+
+2. **Deploy the Code**:
+   - Merge `feature/simplify-rls` branch to main
+   - Deploy with the feature flag set to `false`
+
+3. **Run Database Migrations** (in order):
+   ```sql
+   -- Run in Supabase SQL Editor
+   -- 1. Create v2 functions (safe, parallel to existing)
+   20250113_164156_simplified_rls_functions_v2.sql
+   
+   -- 2. Create disabled v2 policies (safe, inactive)
+   20250113_164257_simplified_rls_policies_v2.sql
+   ```
+
+4. **Test & Monitor** (with flag still false):
+   - Run RLS test suite: `tests/rls-policies.test.sql`
+   - Verify application works normally
+
+5. **Switchover** (when ready):
+   - Create Supabase backup
+   - Run switchover migration: `20250113_164730_rls_switchover.sql`
+   - Set `NEXT_PUBLIC_USE_SIMPLIFIED_RLS=true` in deployment platform
+   - Monitor for 30 minutes
+
+6. **Cleanup** (after 1 week stable):
+   - Follow `docs/rls-simplification-cleanup.md`
+
+### Rollback Plan:
+- Instant: Set `NEXT_PUBLIC_USE_SIMPLIFIED_RLS=false`
+- Full: Run rollback script in `20250113_164730_rls_switchover.sql` comments
+
+### Files Changed:
+- New: `lib/utils/rls-helper.ts` (simplified access control)
+- New: `lib/config/features.ts` (feature flag)
+- Modified: `app/dashboard/page.tsx` (uses feature flag)
+- New migrations: 3 files in `supabase/migrations/`
+- New tests: `tests/rls-policies.test.sql`
+- Backup: `scripts/backup-current-rls.sql`
+
 ## Documentation Strategy
 
 **IMPORTANT: Always consolidate new documentation into README.md rather than creating separate documentation files.**
