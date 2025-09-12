@@ -4,7 +4,7 @@
  */
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import type { SecurityAuditLog } from '@/lib/utils/access-control'
+import { SecurityAuditLog, AUDIT_EVENT_TYPES } from '@/lib/types/audit'
 import { logger } from '@/lib/utils/logger'
 
 /**
@@ -84,39 +84,6 @@ export async function fetchAuditLogs(
     return []
   }
 }
-
-/**
- * Types of security events that can be logged
- */
-export const AUDIT_EVENT_TYPES = {
-  // Access control events
-  ACCESS_GRANTED: 'access_granted',
-  ACCESS_DENIED: 'access_denied',
-  UNAUTHORIZED_ATTEMPT: 'unauthorized_attempt',
-  ADMIN_OVERRIDE: 'admin_override',
-  
-  // Authentication events
-  LOGIN_SUCCESS: 'login_success',
-  LOGIN_FAILURE: 'login_failure',
-  LOGOUT: 'logout',
-  SESSION_EXPIRED: 'session_expired',
-  
-  // Data modification events
-  DATA_CREATE: 'data_create',
-  DATA_UPDATE: 'data_update',
-  DATA_DELETE: 'data_delete',
-  
-  // Rate limiting events
-  RATE_LIMIT_EXCEEDED: 'rate_limit_exceeded',
-  
-  // Admin actions
-  ADMIN_ACTION: 'admin_action',
-  PERMISSION_CHANGE: 'permission_change',
-  
-  // System events
-  SYSTEM_ERROR: 'system_error',
-  CONFIGURATION_CHANGE: 'configuration_change',
-} as const
 
 /**
  * Helper function to create a standardized audit log event
